@@ -14,8 +14,12 @@
 class ProgramOptions {
 public:
 
-	using CodePoints = std::vector< CodePoint >;
+	using CodePoints = std::vector< CodePointRange >;
 	using CodePointssCIt = CodePoints::const_iterator;
+
+	enum FileFormat {
+		BMP, JPEG, PNG, DDS
+	};
 
 	ProgramOptions(int argc, char* argv[])
 	{
@@ -23,10 +27,14 @@ public:
 
 		desc.add_options()
 				("help,h", "produce help message")
-				("filename,f", po::value<std::string>(&mFilename), "ttf font filename")
+				("input,i", po::value<std::string>(&mFontFilename), "input ttf filename")
+				("font,f", po::value<std::string>(&mFontName))
 				("size,s", po::value<int>(&mSize)->default_value(32))
 				("resolution,r", po::value<int>(&mResolution)->default_value(96))
-				("codepage,c", po::value< std::vector<CodePoint>>(&mCodePages)
+				("destination,o", po::value<std::string>(&mDestination)->default_value("out.fontdef"))
+				("extension,e", po::value<std::string>(&mExtension)->default_value("png"))
+				("verbose,v", po::value<bool>(&mIsVerbose)->default_value(false))
+				("codepage,c", po::value< std::vector<CodePointRange>>(&mCodePages)
 				 ->multitoken()
 				 ->default_value({{33,166}}, "33-166"),"range of cod pages")
 				;
@@ -37,21 +45,38 @@ public:
 		if (vm.count("help"))
 			mMustPrintHelp = true;
 
-		if (exist("filename"))
-		{
-			std::ostringstream os;
-			os << "missing filename arguments!\n"
-			   << *this << std::endl;
+		bool must_throw = false;
+		std::ostringstream os;
 
+		if (!exist("input"))
+		{
+			os << "missing filename arguments!\n";
+			must_throw = true;
+		}
+
+		if (!exist("font"))
+		{
+			os << "missing font arguments!\n";
+			must_throw = true;
+		}
+
+		if (must_throw)
+		{
+			os << *this << std::endl;
 			throw std::invalid_argument{os.str()};
 		}
+
 	}
 
 	std::ostream& printOn(std::ostream& os)
 	{
-		os << "filename: " << filename()
+		os << "font filename: " << fontFilename()
+		   << "\nfontname: " << fontName()
+		   << "\ndestination: " << destination()
+		   << "\nextension: " << extension()
 		   << "\nsize: " << size()
 		   << "\nresolution: " << resolution()
+		   << "\nis verbose: " << std::boolalpha << isVerbose()
 		   << "\ncode pages: ";
 		for(const auto& cp : *this)
 			os << cp << ' ';
@@ -68,10 +93,25 @@ public:
 		return os << po.desc;
 	}
 
-
-	const std::string& filename() const noexcept
+	const std::string& fontName() const noexcept
 	{
-		return mFilename;
+		return mFontName;
+	}
+
+	const std::string& destination() const noexcept
+	{
+		return mDestination;
+	}
+
+	const std::string& extension() const noexcept
+	{
+		return mExtension;
+	}
+
+
+	const std::string& fontFilename() const noexcept
+	{
+		return mFontFilename;
 	}
 
 	int size() const noexcept
@@ -82,6 +122,11 @@ public:
 	int resolution() const noexcept
 	{
 		return mResolution;
+	}
+
+	bool isVerbose() const noexcept
+	{
+		return mIsVerbose;
 	}
 
 	CodePointssCIt begin() const noexcept
@@ -97,18 +142,23 @@ public:
 private:
 	bool exist(const std::string& str) const noexcept
 	{
-		return vm.find(str) == std::end(vm);
+		return vm.find(str) != std::end(vm);
 	}
 
 private:
 	boost::program_options::options_description desc{"Options"};
 	boost::program_options::variables_map vm;
 
-	bool mMustPrintHelp = false;
-	std::string mFilename;
-	std::vector<CodePoint> mCodePages;
+	std::string mFontFilename;
+	std::string mDestination;
+	std::string mFontName;
+	std::string mExtension;
+	std::vector<CodePointRange> mCodePages;
 	int mSize;
 	int mResolution;
+
+	bool mMustPrintHelp = false;
+	bool mIsVerbose = false;
 };
 
 #endif // PROGRAMOPTIONS_H
