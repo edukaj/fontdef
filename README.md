@@ -5,7 +5,7 @@ Simple tool that helps create pre generated fonts for ogre
 
 	Options:
 	  -h [ --help ]                      produce help message
-		  -i [ --input-ttf ] arg             input ttf filename
+	  -i [ --input-ttf ] arg             input ttf filename
 	  -f [ --font ] arg                  name of font to use
 	  --image-filename arg (=image.bmp)  output image filename
 	  -s [ --size ] arg (=32)            size of font in pixels
