@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include <boost/program_options.hpp>
+#include <boost/log/trivial.hpp>
 
 class ProgramOptions {
 public:
@@ -17,8 +18,12 @@ public:
 	using CodePoints = std::vector< CodePointRange >;
 	using CodePointssCIt = CodePoints::const_iterator;
 
-	enum FileFormat {
+	enum class FileFormat {
 		BMP, JPEG, PNG, DDS
+	};
+
+	enum class LogLevel {
+		NONE, LOW, MEDIUM, HIGH
 	};
 
 	ProgramOptions(int argc, char* argv[])
@@ -33,7 +38,7 @@ public:
 				("resolution,r", po::value<int>(&mResolution)->default_value(96))
 				("destination,o", po::value<std::string>(&mDestination)->default_value("out.fontdef"))
 				("extension,e", po::value<std::string>(&mExtension)->default_value("png"))
-				("verbose,v", po::value<bool>(&mIsVerbose)->default_value(false))
+				("verbose,v", po::value<int>(&mVerboseLevel)->default_value(false))
 				("codepage,c", po::value< std::vector<CodePointRange>>(&mCodePages)
 				 ->multitoken()
 				 ->default_value({{33,166}}, "33-166"),"range of cod pages")
@@ -66,21 +71,29 @@ public:
 			throw std::invalid_argument{os.str()};
 		}
 
+		if (mustPrintHelp())
+			std::cout << desc << std::endl;
+
+		logParameters();
 	}
 
-	std::ostream& printOn(std::ostream& os)
+	void logParameters()
 	{
-		os << "font filename: " << fontFilename()
-		   << "\nfontname: " << fontName()
-		   << "\ndestination: " << destination()
-		   << "\nextension: " << extension()
-		   << "\nsize: " << size()
-		   << "\nresolution: " << resolution()
-		   << "\nis verbose: " << std::boolalpha << isVerbose()
-		   << "\ncode pages: ";
-		for(const auto& cp : *this)
-			os << cp << ' ';
-		return os << std::endl;
+		if (verboseLevel() == LogLevel::HIGH)
+		{
+			std::cout
+			   << "font filename: " << fontFilename()
+			   << "\nfontname: " << fontName()
+			   << "\nsize: " << size()
+			   << "\nextension: " << extension()
+			   << "\nresolution: " << resolution()
+			   << "\ndestination: " << destination()
+			   << "\nverbose level: " << static_cast<int>(verboseLevel())
+			   << "\ncode pages: ";
+			for(const auto& cp : *this)
+				std::cout << cp << ' ';
+			std::cout << std::endl;
+		}
 	}
 
 	bool mustPrintHelp() const noexcept
@@ -124,9 +137,9 @@ public:
 		return mResolution;
 	}
 
-	bool isVerbose() const noexcept
+	LogLevel verboseLevel() const noexcept
 	{
-		return mIsVerbose;
+		return static_cast<LogLevel>(mVerboseLevel);
 	}
 
 	CodePointssCIt begin() const noexcept
@@ -157,8 +170,13 @@ private:
 	int mSize;
 	int mResolution;
 
+	int mVerboseLevel = 0;
 	bool mMustPrintHelp = false;
-	bool mIsVerbose = false;
+
+	static const int HIGH_VERBOSE = 3;
+	static const int MEDIUM_VERBOSE = 2;
+	static const int LOW_VERBOSE = 1;
+	static const int NO_VERBOSE = 0;
 };
 
 #endif // PROGRAMOPTIONS_H

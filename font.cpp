@@ -13,8 +13,6 @@
 
 #include "font.h"
 
-#define GRAYSCALE 1
-
 std::ostream& operator << (std::ostream& os, FT_Face face)
 {
 	const int DESC_WIDTH = 50;
@@ -69,10 +67,6 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	int max_height = 0;
 	int max_bearing_y = 0;
 
-#if !GRAYSCALE
-	bool antialiasColour = false;
-#endif
-
 	size_t glyphCount = 0;
 	for( const auto& codepage : po )
 	{
@@ -114,7 +108,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	}
 	finalWidth = roundUpSize;
 
-	if (mProgramOptions.isVerbose())
+	if (mProgramOptions.verboseLevel() == ProgramOptions::LogLevel::HIGH)
 		std::cout
 			 << "\nmax width:     " << max_width
 			 << "\nmax height:    " << max_height
@@ -129,12 +123,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 
 	auto textureAspect = (double)finalWidth / (double)finalHeight;
 
-#if GRAYSCALE
 	const size_t pixel_bytes = 1;
-#else
-	const size_t pixel_bytes = 2;
-#endif
-
 	size_t data_width = finalWidth * pixel_bytes;
 	size_t data_size = finalWidth * finalHeight * pixel_bytes;
 
@@ -149,8 +138,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 		{
 			if(FT_Load_Char( face, i, FT_LOAD_RENDER ))
 			{
-				if (mProgramOptions.isVerbose())
-					std::cout << "codepoint " << i << " NOT loaded" << std::endl;
+				std::cerr << "codepoint " << i << " NOT loaded" << std::endl;
 				continue;
 			}
 
@@ -158,7 +146,9 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 
 			if (!buffer)
 			{
-				std::cerr  << " Freetype returned null for character " << i << " in font " << po.fontFilename() << std::endl;
+				std::cerr  << "WARNING: Freetype returned null for character "
+						   << i << " in font "
+						   << po.fontFilename() << std::endl;
 				continue;
 			}
 
@@ -172,26 +162,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 				size_t row = j + m + y_bearing;
 				uint8_t* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
 				for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
-				{
-#if GRAYSCALE
-					// Always use the greyscale value for alpha
 					*pDest++= *buffer++;
-#else
-					if (antialiasColour)
-					{
-						// Use the same greyscale pixel for all components RGBA
-						*pDest++= *buffer;
-					}
-					else
-					{
-						// Always white whether 'on' or 'off' pixel, since alpha
-						// will turn off
-						*pDest++= 0xFF;
-					}
-					// Always use the greyscale value for alpha
-					*pDest++= *buffer++;
-#endif
-				}
 			}
 
 			setGlyphTexCoords(i,
@@ -218,17 +189,12 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	if (ftLib != nullptr)
 		FT_Done_FreeType(ftLib);
 
-#if GRAYSCALE
 	int bpp = 8;
-#else
-	int bpp = 16;
-#endif
-
 	saveFontImage(imageData, finalWidth, finalHeight, bpp,
 				  boost::algorithm::to_lower_copy(mProgramOptions.extension()));
 
 
-	if (mProgramOptions.isVerbose())
+	if (mProgramOptions.verboseLevel() == ProgramOptions::LogLevel::MEDIUM)
 		std::cout << "\nglyph count:   " << glyphCount << std::endl;
 
 	createFontDef();

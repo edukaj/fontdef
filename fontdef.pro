@@ -3,19 +3,18 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-HEADERS += codepage.h \
-           programoptions.h \
-    font.h \
-    glyphinfo.h \
-    rect.h
+HEADERS +=  codepage.h \
+            programoptions.h \
+            font.h \
+            glyphinfo.h \
+            rect.h
 
-SOURCES += main.cpp \
-    font.cpp
+SOURCES +=  main.cpp \
+            font.cpp
 
-DEFINES += USE_OPENCV
+DEFINES += BOOST_ALL_DYN_LINK
 
 win32-msvc2015 {
-    DEFINES += BOOST_ALL_DYN_LINK
     INCLUDEPATH+=../controlib/include
 
     LIBS += -L../controlib/lib
@@ -32,13 +31,10 @@ win32-msvc2015 {
 }
 
 unix {
-
     CONFIG += link_pkgconfig
-    PKGCONFIG += freetype2 opencv
+    PKGCONFIG += freetype2
 
-#    INCLUDEPATH += /usr/include/freetype2
-    LIBS += -lboost_program_options -lfreeimage
-
+    LIBS += -lpthread -lboost_program_options -lboost_log -lboost_log_setup -lfreeimage
 }
 
 HEADERS += \
