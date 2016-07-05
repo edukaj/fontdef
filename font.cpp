@@ -68,9 +68,9 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	int max_bearing_y = 0;
 
 	size_t glyphCount = 0;
-	for( const auto& codepage : po )
+	for( const auto& codePoints : po )
 	{
-		for (int i = codepage.first(); i <= codepage.last(); ++i, ++glyphCount)
+		for (int i = codePoints.first(); i <= codePoints.last(); ++i, ++glyphCount)
 		{
 			FT_Load_Char( face, i, FT_LOAD_RENDER );
 
@@ -132,9 +132,9 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	std::vector<uint8_t> imageData(data_size);
 
 	glyphCount = 0;
-	for( const auto& codepage : po )
+	for( const auto& codepoint : po )
 	{
-		for (int i = codepage.first(); i <= codepage.last(); ++i)
+		for (int i = codepoint.first(); i <= codepoint.last(); ++i)
 		{
 			if(FT_Load_Char( face, i, FT_LOAD_RENDER ))
 			{

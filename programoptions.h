@@ -1,7 +1,7 @@
 #ifndef PROGRAMOPTIONS_H
 #define PROGRAMOPTIONS_H
 
-#include "codepage.h"
+#include "codepoint.h"
 
 #include <string>
 #include <utility>
@@ -69,9 +69,9 @@ public:
 
 				("verbose,v", po::value<int>(&mVerboseLevel)->default_value(false))
 
-				("codepage,c", po::value< std::vector<CodePointRange>>(&mCodePages)
+				("codepoint,c", po::value< std::vector<CodePointRange>>(&mCodePoints)
 				 ->multitoken()
-				 ->default_value({{33,166}}, "33-166"),"range of cod pages")
+				 ->default_value({{33,166}}, "33-166"),"range of cod points")
 				;
 
 		po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -130,7 +130,7 @@ public:
 			   << "\nsize:           " << size()
 			   << "\noutput fontdef: " << output()
 			   << "\nappend mode:    " << std::boolalpha << isAppend()
-			   << "\ncode pages:     ";
+			   << "\ncode point:     ";
 			for(const auto& cp : *this)
 				std::cout << cp << ' ';
 			std::cout
@@ -196,12 +196,12 @@ public:
 
 	CodePointssCIt begin() const noexcept
 	{
-		return std::begin(mCodePages);
+		return std::begin(mCodePoints);
 	}
 
 	CodePointssCIt end() const noexcept
 	{
-		return std::end(mCodePages);
+		return std::end(mCodePoints);
 	}
 
 private:
@@ -219,7 +219,7 @@ private:
 	std::string mFontName;
 	std::string mImageFilename;
 	std::string mImageExtension;
-	std::vector<CodePointRange> mCodePages;
+	std::vector<CodePointRange> mCodePoints;
 	int mSize;
 	int mResolution;
 

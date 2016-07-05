@@ -1,7 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "codepage.h"
+#include "codepoint.h"
 #include "glyphinfo.h"
 #include "programoptions.h"
 #include <unordered_map>

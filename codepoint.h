@@ -37,7 +37,7 @@ public:
 		auto separatorPos = toParse.find_first_of('-');
 
 		if (separatorPos == std::string::npos)
-			throw std::invalid_argument{"unable to parse codepage"};
+			throw std::invalid_argument{"unable to parse code points"};
 
 		auto firstNumber = std::stoi(toParse.substr(0, separatorPos));
 		auto secondNumber = std::stoi(toParse.substr(separatorPos + 1));

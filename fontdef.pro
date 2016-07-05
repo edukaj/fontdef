@@ -3,11 +3,12 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-HEADERS +=  codepage.h \
+HEADERS +=  \
             programoptions.h \
             font.h \
             glyphinfo.h \
-            rect.h
+            rect.h \
+            codepoint.h
 
 SOURCES +=  main.cpp \
             font.cpp
@@ -38,5 +39,4 @@ unix {
 }
 
 HEADERS += \
-    programoptions.h \
-    codepage.h
+    programoptions.h
