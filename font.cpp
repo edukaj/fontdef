@@ -54,7 +54,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 		throw std::runtime_error{"unable to init FreeType"};
 
 	FT_Face face;
-	if (FT_New_Face(ftLib, po.fontFilename().c_str(), 0, &face ))
+	if (FT_New_Face(ftLib, po.inputFont().c_str(), 0, &face ))
 		throw std::runtime_error{"unable to init font face"};
 
 	// Convert our point size to freetype 26.6 fixed point format
@@ -148,7 +148,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 			{
 				std::cerr  << "WARNING: Freetype returned null for character "
 						   << i << " in font "
-						   << po.fontFilename() << std::endl;
+						   << po.inputFont() << std::endl;
 				continue;
 			}
 
@@ -191,7 +191,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 
 	int bpp = 8;
 	saveFontImage(imageData, finalWidth, finalHeight, bpp,
-				  boost::algorithm::to_lower_copy(mProgramOptions.extension()));
+				  boost::algorithm::to_lower_copy(mProgramOptions.imageExtension()));
 
 
 	if (mProgramOptions.verboseLevel() == ProgramOptions::LogLevel::MEDIUM)
@@ -225,13 +225,16 @@ void Font::setGlyphTexCoords(int id, Real u1, Real v1, Real u2, Real v2, Real te
 
 void Font::createFontDef()
 {
-	std::ofstream os(mProgramOptions.destination() + std::string{".fontdef"} );
+	std::ios_base::openmode openMode = mProgramOptions.isAppend() ?
+				 (std::ios_base::out | std::ios_base::app) :
+				 (std::ios_base::out | std::ios_base::trunc);
 
+	std::fstream os(mProgramOptions.output(), openMode );
 	os << mProgramOptions.fontName()
 	   << "\n{\n\t"
 		  "type   image\n\t"
 		  "source "
-	   << mProgramOptions.destination() << '.' << mProgramOptions.extension() << "\n\n";
+	   << mProgramOptions.imageFilename() << "\n\n";
 
 	for(const auto& glyph : mGlyphMap)
 	{
@@ -243,7 +246,28 @@ void Font::createFontDef()
 		   << glyphInfo.uvRect.bottom << '\n';
 	}
 
-	os << '}' << std::endl;
+	os << "}\n\n" << std::flush;
+}
+
+int Font::extractFreeImageExtensionFrom(const std::string& ext)
+{
+	auto freeImageExt = FIF_BMP;
+
+	if (ext == std::string{"bmp"})
+		freeImageExt = FIF_BMP;
+	else if (ext == std::string{"png"})
+		freeImageExt = FIF_PNG;
+	else if (ext == std::string{"jpg"})
+		freeImageExt = FIF_JPEG;
+	else if (ext == std::string{"jpeg"})
+		freeImageExt = FIF_JPEG;
+	else if (ext == std::string{"tga"})
+		freeImageExt = FIF_TARGA;
+	else if (ext == std::string{"tiff"})
+		freeImageExt = FIF_TIFF;
+	else throw std::invalid_argument{"unsuppordet image extension"};
+
+	return freeImageExt;
 }
 
 void Font::saveFontImage(const std::vector<uint8_t>& imageData, size_t width, size_t height, int bpp, const std::string& ext)
@@ -252,10 +276,8 @@ void Font::saveFontImage(const std::vector<uint8_t>& imageData, size_t width, si
 	FIBITMAP* dib = FreeImage_ConvertFromRawBits(const_cast<uint8_t*>(imageData.data()),
 												 width, height, width, bpp, 0, 0, 0, TRUE);
 
-	if (ext == std::string{"bmp"})
-		FreeImage_Save(FIF_BMP, dib, (mProgramOptions.destination() + std::string{".bmp"}).c_str());
-	else if (ext == std::string{"png"})
-		FreeImage_Save(FIF_PNG, dib, (mProgramOptions.destination() + std::string{".png"}).c_str());
-	else if (ext == std::string{"dds"})
-		FreeImage_Save(FIF_DDS, dib, (mProgramOptions.destination() + std::string{".dds"}).c_str());
+	auto freeImageExt = static_cast<FREE_IMAGE_FORMAT>(
+				extractFreeImageExtensionFrom(ext));
+
+	FreeImage_Save(freeImageExt, dib, mProgramOptions.imageFilename().c_str());
 }

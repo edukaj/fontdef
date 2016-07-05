@@ -26,19 +26,49 @@ public:
 		NONE, LOW, MEDIUM, HIGH
 	};
 
+	void extractExtension()
+	{
+		auto pointPos = mImageFilename.find_last_of('.');
+
+		if (pointPos == std::string::npos )
+			throw std::invalid_argument{"image filename without extension"};
+		if (pointPos + 1 >= mImageFilename.length())
+			throw std::invalid_argument{"image filename without extension"};
+
+		mImageExtension = mImageFilename.substr(pointPos+1);
+	}
+
 	ProgramOptions(int argc, char* argv[])
 	{
 		namespace po = boost::program_options;
 
 		desc.add_options()
 				("help,h", "produce help message")
-				("input,i", po::value<std::string>(&mFontFilename), "input ttf filename")
-				("font,f", po::value<std::string>(&mFontName))
-				("size,s", po::value<int>(&mSize)->default_value(32))
-				("resolution,r", po::value<int>(&mResolution)->default_value(96))
-				("destination,o", po::value<std::string>(&mDestination)->default_value("out.fontdef"))
-				("extension,e", po::value<std::string>(&mExtension)->default_value("png"))
+
+				("input-ttf,i", po::value<std::string>(&mInputFont),
+				 "input ttf filename")
+
+				("font,f", po::value<std::string>(&mFontName),
+				 "name of font to use")
+
+				("image-filename", po::value<std::string>(&mImageFilename)
+				 ->default_value("image.bmp"),
+				 "output image filename")
+
+				("size,s", po::value<int>(&mSize)->default_value(32),
+				 "size of font in pixels")
+
+				("resolution,r", po::value<int>(&mResolution)->default_value(96),
+				 "resolution in dpi")
+
+				("output,o", po::value<std::string>(&mOutputFontDef)->default_value("out.fontdef"),
+				 "outupt fontdef file")
+
+				("append-mode,a",
+				 "use if you want to append to an existing fontdef")
+
 				("verbose,v", po::value<int>(&mVerboseLevel)->default_value(false))
+
 				("codepage,c", po::value< std::vector<CodePointRange>>(&mCodePages)
 				 ->multitoken()
 				 ->default_value({{33,166}}, "33-166"),"range of cod pages")
@@ -50,10 +80,16 @@ public:
 		if (vm.count("help"))
 			mMustPrintHelp = true;
 
+		if (vm.count("image-filename"))
+		{
+			if (verboseLevel() == LogLevel::MEDIUM)
+				std::cout << "image-filename not set default is: " << output() << std::endl;
+		}
+
 		bool must_throw = false;
 		std::ostringstream os;
 
-		if (!exist("input"))
+		if (!exist("input-ttf"))
 		{
 			os << "missing filename arguments!\n";
 			must_throw = true;
@@ -65,6 +101,8 @@ public:
 			must_throw = true;
 		}
 
+		mIsAppend = exist("append-mode");
+
 		if (must_throw)
 		{
 			os << *this << std::endl;
@@ -74,6 +112,8 @@ public:
 		if (mustPrintHelp())
 			std::cout << desc << std::endl;
 
+		extractExtension();
+
 		logParameters();
 	}
 
@@ -82,17 +122,20 @@ public:
 		if (verboseLevel() == LogLevel::HIGH)
 		{
 			std::cout
-			   << "font filename: " << fontFilename()
-			   << "\nfontname: " << fontName()
-			   << "\nsize: " << size()
-			   << "\nextension: " << extension()
-			   << "\nresolution: " << resolution()
-			   << "\ndestination: " << destination()
-			   << "\nverbose level: " << static_cast<int>(verboseLevel())
-			   << "\ncode pages: ";
+			   << "\nfont filename:    " << inputFont()
+			   << "\nfontname:       " << fontName()
+			   << "\noutput image:   " << imageFilename()
+			   << "\nextension:      " << imageExtension()
+			   << "\nresolution:     " << resolution()
+			   << "\nsize:           " << size()
+			   << "\noutput fontdef: " << output()
+			   << "\nappend mode:    " << std::boolalpha << isAppend()
+			   << "\ncode pages:     ";
 			for(const auto& cp : *this)
 				std::cout << cp << ' ';
-			std::cout << std::endl;
+			std::cout
+			   << "\nverbose level:  " << static_cast<int>(verboseLevel())
+			   << std::endl;
 		}
 	}
 
@@ -111,20 +154,14 @@ public:
 		return mFontName;
 	}
 
-	const std::string& destination() const noexcept
+	const std::string& output() const noexcept
 	{
-		return mDestination;
+		return mOutputFontDef;
 	}
 
-	const std::string& extension() const noexcept
+	const std::string& inputFont() const noexcept
 	{
-		return mExtension;
-	}
-
-
-	const std::string& fontFilename() const noexcept
-	{
-		return mFontFilename;
+		return mInputFont;
 	}
 
 	int size() const noexcept
@@ -135,6 +172,21 @@ public:
 	int resolution() const noexcept
 	{
 		return mResolution;
+	}
+
+	const std::string& imageFilename() const noexcept
+	{
+		return mImageFilename;
+	}
+
+	const std::string& imageExtension() const noexcept
+	{
+		return mImageExtension;
+	}
+
+	bool isAppend() const noexcept
+	{
+		return mIsAppend;
 	}
 
 	LogLevel verboseLevel() const noexcept
@@ -162,16 +214,18 @@ private:
 	boost::program_options::options_description desc{"Options"};
 	boost::program_options::variables_map vm;
 
-	std::string mFontFilename;
-	std::string mDestination;
+	std::string mInputFont;
+	std::string mOutputFontDef;
 	std::string mFontName;
-	std::string mExtension;
+	std::string mImageFilename;
+	std::string mImageExtension;
 	std::vector<CodePointRange> mCodePages;
 	int mSize;
 	int mResolution;
 
 	int mVerboseLevel = 0;
 	bool mMustPrintHelp = false;
+	bool mIsAppend = false;
 
 	static const int HIGH_VERBOSE = 3;
 	static const int MEDIUM_VERBOSE = 2;

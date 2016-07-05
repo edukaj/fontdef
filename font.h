@@ -22,6 +22,7 @@ private:
 	using GlyphInfoMap = std::unordered_map<int, GlyphInfo>;
 	const ProgramOptions& mProgramOptions;
 	GlyphInfoMap mGlyphMap;
+	int extractFreeImageExtensionFrom(const std::string& ext);
 };
 
 #endif // FONT_H
