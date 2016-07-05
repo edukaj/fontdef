@@ -17,12 +17,12 @@ Simple tool that helps create pre generated fonts for ogre
 	  -c [ --codepoint ] arg (=33-166)   range of cod points
 
 
-`--input-ttf`: ttf font filename
-`--image-filename`: image filename containg all glyphs. The filename must contain a valid extension between bmp, png, tiff, jpg, fpeg
-`--font`: title of the font used by Ogre 
-`--size`: size of the font in pixels
-`--resolution`: resolution in dpi
-`--output`: output fontdef filename
-`-a`: if used the output file will not be overwritten: all write operations are done in append.
-`--codepoints`: list of code points range (for example 33-166 2048-5060 ...)
+* `--input-ttf`: ttf font filename
+* `--image-filename`: image filename containg all glyphs. The filename must contain a valid extension between bmp, png, tiff, jpg, fpeg
+* `--font`: title of the font used by Ogre 
+* `--size`: size of the font in pixels
+* `--resolution`: resolution in dpi
+* `--output`: output fontdef filename
+* `-a`: if used the output file will not be overwritten: all write operations are done in append.
+* `--codepoints`: list of code points range (for example 33-166 2048-5060 ...)
 
