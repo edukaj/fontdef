@@ -108,7 +108,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	}
 	finalWidth = roundUpSize;
 
-	if (mProgramOptions.verboseLevel() == ProgramOptions::LogLevel::HIGH)
+	if ((int)mProgramOptions.verboseLevel() >= (int)ProgramOptions::LogLevel::HIGH)
 		std::cout
 			 << "\nmax width:     " << max_width
 			 << "\nmax height:    " << max_height
@@ -184,8 +184,6 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 			}
 		}
 	}
-
-
 	if (ftLib != nullptr)
 		FT_Done_FreeType(ftLib);
 
@@ -193,8 +191,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	saveFontImage(imageData, finalWidth, finalHeight, bpp,
 				  boost::algorithm::to_lower_copy(mProgramOptions.imageExtension()));
 
-
-	if (mProgramOptions.verboseLevel() == ProgramOptions::LogLevel::MEDIUM)
+	if ((int)mProgramOptions.verboseLevel() >= (int)ProgramOptions::LogLevel::MEDIUM)
 		std::cout << "\nglyph count:   " << glyphCount << std::endl;
 
 	createFontDef();
