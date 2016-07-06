@@ -11,7 +11,7 @@
 #include FT_GLYPH_H
 #include <FreeImage.h>
 
-#include "font.h"
+#include "fontdefgenerator.h"
 
 std::ostream& operator << (std::ostream& os, FT_Face face)
 {
@@ -46,7 +46,9 @@ static inline uint32_t firstPO2From(uint32_t n)
 	return n;
 }
 
-Font::Font(const ProgramOptions& po) : mProgramOptions{po}
+
+
+void FontdefGenerator::generate()
 {
 	FT_Library ftLib = nullptr;
 
@@ -54,13 +56,13 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 		throw std::runtime_error{"unable to init FreeType"};
 
 	FT_Face face;
-	if (FT_New_Face(ftLib, po.inputFont().c_str(), 0, &face ))
+	if (FT_New_Face(ftLib, mProgramOptions.inputFont().c_str(), 0, &face ))
 		throw std::runtime_error{"unable to init font face"};
 
 	// Convert our point size to freetype 26.6 fixed point format
 
-	FT_F26Dot6 ftSize = (FT_F26Dot6)(po.size() * (1 << 6));
-	if( FT_Set_Char_Size( face, ftSize, 0, po.resolution(), po.resolution() ) )
+	FT_F26Dot6 ftSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
+	if( FT_Set_Char_Size( face, ftSize, 0, mProgramOptions.resolution(), mProgramOptions.resolution() ) )
 		throw std::runtime_error{"unable to set char size"};
 
 	int max_width = 0;
@@ -68,7 +70,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	int max_bearing_y = 0;
 
 	size_t glyphCount = 0;
-	for( const auto& codePoints : po )
+	for( const auto& codePoints : mProgramOptions )
 	{
 		for (int i = codePoints.first(); i <= codePoints.last(); ++i, ++glyphCount)
 		{
@@ -132,7 +134,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 	std::vector<uint8_t> imageData(data_size);
 
 	glyphCount = 0;
-	for( const auto& codepoint : po )
+	for( const auto& codepoint : mProgramOptions )
 	{
 		for (int i = codepoint.first(); i <= codepoint.last(); ++i)
 		{
@@ -148,7 +150,7 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 			{
 				std::cerr  << "WARNING: Freetype returned null for character "
 						   << i << " in font "
-						   << po.inputFont() << std::endl;
+						   << mProgramOptions.inputFont() << std::endl;
 				continue;
 			}
 
@@ -195,10 +197,9 @@ Font::Font(const ProgramOptions& po) : mProgramOptions{po}
 		std::cout << "\nglyph count:   " << glyphCount << std::endl;
 
 	createFontDef();
-
 }
 
-void Font::setGlyphTexCoords(int id, Real u1, Real v1, Real u2, Real v2, Real textureAspect)
+void FontdefGenerator::setGlyphTexCoords(int id, Real u1, Real v1, Real u2, Real v2, Real textureAspect)
 {
 	GlyphInfoMap::iterator i = mGlyphMap.find(id);
 	if (i != mGlyphMap.end())
@@ -220,7 +221,7 @@ void Font::setGlyphTexCoords(int id, Real u1, Real v1, Real u2, Real v2, Real te
 	}
 }
 
-void Font::createFontDef()
+void FontdefGenerator::createFontDef()
 {
 	std::ios_base::openmode openMode = mProgramOptions.isAppend() ?
 				 (std::ios_base::out | std::ios_base::app) :
@@ -246,7 +247,7 @@ void Font::createFontDef()
 	os << "}\n\n" << std::flush;
 }
 
-int Font::extractFreeImageExtensionFrom(const std::string& ext)
+int FontdefGenerator::extractFreeImageExtensionFrom(const std::string& ext)
 {
 	auto freeImageExt = FIF_BMP;
 
@@ -267,7 +268,7 @@ int Font::extractFreeImageExtensionFrom(const std::string& ext)
 	return freeImageExt;
 }
 
-void Font::saveFontImage(const std::vector<uint8_t>& imageData, size_t width, size_t height, int bpp, const std::string& ext)
+void FontdefGenerator::saveFontImage(const std::vector<uint8_t>& imageData, size_t width, size_t height, int bpp, const std::string& ext)
 {
 
 	FIBITMAP* dib = FreeImage_ConvertFromRawBits(const_cast<uint8_t*>(imageData.data()),

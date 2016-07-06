@@ -1,5 +1,4 @@
-#ifndef PROGRAMOPTIONS_H
-#define PROGRAMOPTIONS_H
+#pragma once
 
 #include "codepoint.h"
 #include <boost/program_options.hpp>
@@ -59,5 +58,3 @@ private:
 	bool mShowOnlyHelp = false;
 	bool mIsAppend = false;
 };
-
-#endif // PROGRAMOPTIONS_H

@@ -1,15 +1,17 @@
-#ifndef FONT_H
-#define FONT_H
+#pragma once
 
 #include "codepoint.h"
 #include "glyphinfo.h"
 #include "programoptions.h"
 #include <unordered_map>
 
-class Font
+class FontdefGenerator
 {
 public:
-	Font(const ProgramOptions& po);
+	FontdefGenerator(const ProgramOptions& po) : mProgramOptions{po}
+	{}
+
+	void generate();
 
 private:
 	void setGlyphTexCoords(int id, Real u1, Real v1, Real u2, Real v2, Real textureAspect);
@@ -24,5 +26,3 @@ private:
 	GlyphInfoMap mGlyphMap;
 	int extractFreeImageExtensionFrom(const std::string& ext);
 };
-
-#endif // FONT_H

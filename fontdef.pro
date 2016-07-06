@@ -5,15 +5,15 @@ CONFIG -= qt
 
 HEADERS +=  \
             programoptions.h \
-            font.h \
             glyphinfo.h \
             rect.h \
-            codepoint.h
+            codepoint.h \
+    fontdefgenerator.h
 
 SOURCES +=  main.cpp \
-            font.cpp \
     programoptions.cpp \
-    codepoint.cpp
+    codepoint.cpp \
+    fontdefgenerator.cpp
 
 DEFINES += BOOST_ALL_DYN_LINK
 

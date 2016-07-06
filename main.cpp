@@ -1,5 +1,5 @@
 #include <iostream>
-#include "font.h"
+#include "fontdefgenerator.h"
 
 using namespace std;
 
@@ -10,8 +10,10 @@ int main(int argc, char *argv[])
 	{
 		ProgramOptions po(argc, argv);
 
+		FontdefGenerator fontdefGen{po};
+
 		if (!po.showOnlyHelp())
-			Font{po};
+			fontdefGen.generate();
 	}
 	catch(const exception& exc)
 	{
