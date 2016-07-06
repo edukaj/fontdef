@@ -1,34 +1,21 @@
-# file: fontdef_autocompletition 
+# file: fontdef_autocompletition
 # fontdef parameter-completion
-
-#set -x
 
 _fontdef ()   #  By convention, the function name
 {                 #+ starts with an underscore.
-  local cur prev opts base
-  # Pointer to current completion word.
-  # By convention, it's named "cur" but this isn't strictly necessary.
+    local cur prev options
 
-  COMPREPLY=()   # Array variable storing the possible completions.
+    COMPREPLY=()
 
-  cur=${COMP_WORDS[COMP_CWORD]}
-  prev="${COMP_WORDS[COMP_CWORD-1]}"
-  opts="-h --help -i --input-ttf  -f --font -image-filename -s --size -r --resolution -o --output -a --append-mode -v --verbose -c --codepoint"
+    # Select precisely the tokens from schroot --help that begin with a dash
+    options=$(./fontdef --help | sed 's/\(^\|[[:space:]]\)[^[:space:]-][^[:space:]]*//g')
 
-  case "$cur" in
-    -*)
-      COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-      return 0
-      ;;
-  esac
-  
-#  case "$prev" in
-#  --input-ttf)
-#     complete -d
-#     return 0
-#     ;;
-#  esac
+    if [ "$prev" = "-i" ] || [ "$prev" = "--input-ttf" ]; then
+        COMPREPLY=( $(compgen -o plusdirs -f -X '!*.ttf' -- $cur) )
+    else
+        COMPREPLY=( $(compgen -W "$options" -- $cur) )
+    fi
+    return 0
 }
 
 complete -F _fontdef -o filenames ./fontdef
-#        ^^ ^^^^^^^^^^^^  Invokes the function _fontdef.

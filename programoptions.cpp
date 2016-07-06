@@ -18,11 +18,11 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 po::value<string>(&mInputFont),
 			 "input ttf filename")
 
-			("font,f",
+			("fontname,n",
 			 po::value<string>(&mFontName),
 			 "name of font to use")
 
-			("image-filename",
+			("image-filename,f",
 			 po::value<string>(&mImageFilename)
 			 ->default_value("image.bmp"),
 			 "output image filename")
