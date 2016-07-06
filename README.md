@@ -17,6 +17,7 @@ Simple tool that helps create pre generated fonts for ogre
     -c [ --codepoint ] arg (=33-166)      range of cod points
 
 
+
 * `--input-ttf`: ttf font filename
 * `--fontname`: title of the font used by Ogre 
 * `--image-filename`: image filename containg all glyphs. The filename must contain a valid extension between bmp, png, tiff, jpg, jpeg
@@ -30,9 +31,9 @@ Simple tool that helps create pre generated fonts for ogre
 Build this project is really simple just open it with qtcreator and build
 
 # Dependencies 
-fontdef depends from boost-program-options and freeimage
+fontdef depends from `boost-program-options` and `freeimage`
 
-#Linux
+## Linux
 On linux just type 
 
 	sudo apt install libboost-program-options-dev libfreeimage-dev
@@ -41,5 +42,7 @@ or
 
 	sudo apt-get install libboost-program-options-dev libfreeimage-dev
 	
-On windows download that libraries and set fontdef.pro 
+## windows
+download that libraries and set fontdef.pro 
 
+Maybe some modification are required. 
