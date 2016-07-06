@@ -1,7 +1,7 @@
 # file: fontdef_autocompletition
 # fontdef parameter-completion
 
-_fontdef ()   #  By convention, the function name
+_fontdefnew ()   #  By convention, the function name
 {                 #+ starts with an underscore.
     local cur prev options
 
@@ -10,11 +10,42 @@ _fontdef ()   #  By convention, the function name
     # Select precisely the tokens from schroot --help that begin with a dash
     options=$(./fontdef --help | sed 's/\(^\|[[:space:]]\)[^[:space:]-][^[:space:]]*//g')
 
-    if [ "$prev" = "-i" ] || [ "$prev" = "--input-ttf" ]; then
-        COMPREPLY=( $(compgen -o plusdirs -f -X '!*.ttf' -- $cur) )
-    else
-        COMPREPLY=( $(compgen -W "$options" -- $cur) )
+    case "$cur" in
+    -*)
+      echo "${options}"
+      COMPREPLY=( $(compgen -W "${options}" -- $cur) )
+      ;;
+    esac
+
+    if [ "${prev}" = "-i" ] || [ "${prev}" = "--input-ttf" ]; then
+        COMPREPLY=( $(compgen -o plusdirs -f -X '!*.ttf' -- ${cur}) )
     fi
+
+   return 0
+}
+
+_fontdef ()   #  By convention, the function name
+{                 #+ starts with an underscore.
+    local cur prev options
+
+    COMPREPLY=()
+
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    # Select precisely the tokens from schroot --help that begin with a dash
+    options=$(./fontdef --help | sed 's/\(^\|[[:space:]]\)[^[:space:]-][^[:space:]]*//g')
+
+    case "${cur}" in
+    -*)
+      COMPREPLY=( $(compgen -W "${options}" -- $cur) )
+      ;;
+    esac
+
+    if [ "${prev}" = "-i" ] || [ "${prev}" = "--input-ttf" ]; then
+        COMPREPLY=( $(compgen -o plusdirs -f -X '!*.ttf' -- ${cur}) )
+    fi
+
     return 0
 }
 
