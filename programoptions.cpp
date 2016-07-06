@@ -41,7 +41,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 ->default_value("out.fontdef"),
 			 "outupt fontdef file")
 
-			("append-mode,a",
+			("append,a",
 			 "use if you want to append to an existing fontdef")
 
 			("verbose,v",
