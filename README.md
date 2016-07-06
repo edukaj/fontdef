@@ -26,3 +26,20 @@ Simple tool that helps create pre generated fonts for ogre
 * `--append-mode`: if present all write operation are done in append mode without overwrite existing fontdef content
 * `--codepoints`: list of code points range (for example 33-166 2048-5060 ...)
 
+# Build
+Build this project is really simple just open it with qtcreator and build
+
+# Dependencies 
+fontdef depends from boost-program-options and freeimage
+
+#Linux
+On linux just type 
+
+	sudo apt install libboost-program-options-dev libfreeimage-dev
+
+or
+
+	sudo apt-get install libboost-program-options-dev libfreeimage-dev
+	
+On windows download that libraries and set fontdef.pro 
+
