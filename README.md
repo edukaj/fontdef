@@ -73,3 +73,18 @@ must be something like `major.minor-revision` for example
 download that libraries and set fontdef.pro 
 
 Maybe some modification are required. 
+
+If you prefer the command line open a shell with all Qt variables setted. In the fontdef.pro file I'm using Visual C++ 2015, 
+I've not tested with other versions.
+
+
+        git clone https://github.com/edukaj/fontdef
+        cd fontdef
+        mkdir build
+        cd build
+        qmake ../fontdef.pro -r -spec win32-msvc2015
+        jom 
+ 
+If `jom` is not installed I suggest to download and install it from Qt web page.
+
+I've not yet provided a package manager for windows but is just an exe file.
