@@ -46,6 +46,8 @@ or for older Ubuntu (like 14.04 and previous)
 
 	sudo apt-get install libboost-program-options-dev libfreeimage-dev libfreetype6-dev
 	
+after installed this dependencies follow the instruction below:
+
 
         git clone https://github.com/edukaj/fontdef
         cd fontdef
