@@ -9,7 +9,9 @@ int main(int argc, char *argv[])
 	try
 	{
 		ProgramOptions po(argc, argv);
-		Font{po};
+
+		if (!po.showOnlyHelp())
+			Font{po};
 	}
 	catch(const exception& exc)
 	{

@@ -11,7 +11,9 @@ HEADERS +=  \
             codepoint.h
 
 SOURCES +=  main.cpp \
-            font.cpp
+            font.cpp \
+    programoptions.cpp \
+    codepoint.cpp
 
 DEFINES += BOOST_ALL_DYN_LINK
 
