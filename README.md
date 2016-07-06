@@ -49,6 +49,8 @@ or
 
 	sudo apt-get install libboost-program-options-dev libfreeimage-dev
 	
+
+## Package
 I've alse created a bash script called `build-deb` that allow you to 
 create a distributable package for an easier installation.
 
