@@ -1,0 +1,35 @@
+#!/bin/bash
+
+name=fontdef
+version=$1
+bin=$2
+
+usage() {
+	echo "usage:"
+	echo "build-deb version binary"
+	echo
+	echo "example build-dev 1.1-0 ../dist/fontdef"
+}
+
+if [ $# -lt 2 ]; then
+	usage
+fi
+
+if [ $# -gt 2 ]; then
+        usage
+fi
+
+folder=fontdef_${version}
+debian=${folder}/DEBIAN
+
+if [ ! -d ${folder} ]; then
+	mkdir ${folder}
+	mkdir ${folder}/bin
+	mkdir ${debian}
+fi
+
+sed "s/version_to_replace/${version}/g" controlTemplate > ${debian}/control
+cp -r pkg/usr ${folder}
+cp -r ${bin} ${folder}/usr/bin/
+
+dpkg-deb --build ${folder}

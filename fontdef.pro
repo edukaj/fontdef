@@ -37,7 +37,7 @@ unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += freetype2
 
-    LIBS += -lpthread -lboost_program_options -lboost_log -lboost_log_setup -lfreeimage
+    LIBS += -lpthread -lboost_program_options -lfreeimage
 }
 
 HEADERS += \

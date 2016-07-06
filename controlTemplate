@@ -1,0 +1,11 @@
+Package: fontdef
+Version: version_to_replace 
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: libboost-program-options1.58.0 (>= 1.58.0), libfreeimage3 (>= 3.17.0)
+Maintainer: Dukaj Elvis <edukaj@qubicaamf.com>
+Description: Font generator for OGRE 
+ This utility allow you to generate font atlas from a ttf font with
+ desiderated font size and resolution. A fontdef file is also
+ generated to allow ogre to import it as a resource.
