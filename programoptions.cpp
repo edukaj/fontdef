@@ -80,13 +80,13 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		must_throw = true;
 	}
 
-	if (!exist("font"))
+	if (!exist("fontname"))
 	{
 		os << "missing font arguments!\n";
 		must_throw = true;
 	}
 
-	mIsAppend = exist("append-mode");
+	mIsAppend = exist("append");
 
 	if (must_throw)
 	{

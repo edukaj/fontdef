@@ -20,16 +20,16 @@ if [ $# -gt 2 ]; then
 fi
 
 folder=fontdef_${version}
+bin_folder=${folder}/usr/bin
 debian=${folder}/DEBIAN
 
 if [ ! -d ${folder} ]; then
-	mkdir ${folder}
-	mkdir ${folder}/bin
+	mkdir -p ${bin_folder}
 	mkdir ${debian}
 fi
 
 sed "s/version_to_replace/${version}/g" controlTemplate > ${debian}/control
 cp -r pkg/usr ${folder}
-cp -r ${bin} ${folder}/usr/bin/
+cp -r ${bin} ${bin_folder}
 
 dpkg-deb --build ${folder}
