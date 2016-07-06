@@ -40,7 +40,7 @@ On linux just type
 
 	sudo apt install libboost-program-options-dev libfreeimage-dev libfreetype6-dev
 
-or
+or for older Ubuntu (like 14.04 and previous)
 
 	sudo apt-get install libboost-program-options-dev libfreeimage-dev libfreetype6-dev
 	
@@ -53,7 +53,7 @@ The usage is really simple `build-deb version generated-binary` where version
 must be something like `major.minor-revision` for example 
 
 	build-deb 1.0-0 ../Release/fontdef
-
+	sudo dpkg -i fontdef_1.0-0.deb
 
 ## windows
 download that libraries and set fontdef.pro 
