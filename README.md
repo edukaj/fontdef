@@ -1,5 +1,12 @@
 # fontdef
-Simple tool that helps create pre generated fonts for ogre
+This utility allow you to generate font atlas from a ttf font with
+desiderated font size and resolution. 
+
+A fontdef file is also generated to allow ogre to import it as a resource.
+
+This utility is also used for general purpose games
+
+The generated image as power of two side dimensions.
 
 # usage
 
