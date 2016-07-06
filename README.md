@@ -22,7 +22,7 @@ The generated image as power of two side dimensions.
 
 * `--input-ttf`: ttf font filename
 * `--fontname`: title of the font used by Ogre 
-* `--image-filename`: image filename containg all glyphs. The filename must contain a valid extension between bmp, png, tiff, jpg, jpeg
+* `--image-filename`: image filename containg all glyphs. The filename must contain a valid extension between `bmp`, `png`, `tiff`, `jpg`, `jpeg`
 * `--size`: size of the font in pixels
 * `--resolution`: resolution in dpi
 * `--output`: output fontdef filename
