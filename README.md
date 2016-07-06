@@ -85,6 +85,6 @@ I've not tested with other versions.
         qmake ../fontdef.pro -r -spec win32-msvc2015
         jom 
  
-If `jom` is not installed I suggest to download and install it from Qt web page.
+If `jom` is not installed I suggest to download and install it from Qt web page or you can use nmake.
 
 I've not yet provided a package manager for windows but is just an exe file.
