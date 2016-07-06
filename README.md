@@ -18,7 +18,7 @@ The generated image as power of two side dimensions.
     -s [ --size ] arg (=32)               size of font in pixels
     -r [ --resolution ] arg (=96)         resolution in dpi
     -o [ --output ] arg (=out.fontdef)    outupt fontdef file
-    -a [ --append-mode ]                  use if you want to append to an 
+    -a [ --append ]                       use if you want to append to an 
                                           existing fontdef
     -v [ --verbose ] arg (=0)             verbose level [0-3]
     -c [ --codepoint ] arg (=33-166)      range of cod points
