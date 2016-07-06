@@ -32,6 +32,8 @@ The generated image as power of two side dimensions.
 # Build
 Build this project is really simple just open it with qtcreator and build
 
+If you prefer to build from shell this are the steps
+
 # Dependencies 
 fontdef depends from `boost-program-options` and `freeimage` and `freetype`
 
@@ -44,6 +46,16 @@ or for older Ubuntu (like 14.04 and previous)
 
 	sudo apt-get install libboost-program-options-dev libfreeimage-dev libfreetype6-dev
 	
+
+        git clone https://github.com/edukaj/fontdef
+        cd fontdef
+        mkdir build
+        cd build
+        qmake ../fontdef.pro -r -spec linux-g++
+        make
+        cd ..
+        ./build-deb 1.0-1 build/fontdef
+        sudo dpkg -i fontdef_1.0-1.deb
 
 ## Package
 I've alse created a bash script called `build-deb` that allow you to 
