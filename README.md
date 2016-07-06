@@ -49,6 +49,15 @@ or
 
 	sudo apt-get install libboost-program-options-dev libfreeimage-dev
 	
+I've alse created a bash script called `build-deb` that allow you to 
+create a distributable package for an easier installation.
+
+The usage is really simple `build-deb version generated-binary` where version
+must be something like `major.minor-revision` for example 
+
+	build-deb 1.0-0 ../Release/fontdef
+
+
 ## windows
 download that libraries and set fontdef.pro 
 
