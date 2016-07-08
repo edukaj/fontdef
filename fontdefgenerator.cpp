@@ -70,7 +70,7 @@ void FontdefGenerator::generate()
 	int max_bearing_y = 0;
 
 	size_t glyphCount = 0;
-	for( const auto& codePoints : mProgramOptions )
+	for( const auto& codePoints : mProgramOptions.codepoints() )
 	{
 		for (int i = codePoints.first(); i <= codePoints.last(); ++i, ++glyphCount)
 		{
@@ -134,7 +134,7 @@ void FontdefGenerator::generate()
 	std::vector<uint8_t> imageData(data_size);
 
 	glyphCount = 0;
-	for( const auto& codepoint : mProgramOptions )
+	for( const auto& codepoint : mProgramOptions.codepoints() )
 	{
 		for (int i = codepoint.first(); i <= codepoint.last(); ++i)
 		{

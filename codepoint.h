@@ -8,7 +8,7 @@ using Real = float;
 
 class CodePointRange {
 public:
-	CodePointRange(int first = 0, int last = 0)
+	explicit CodePointRange(int first = 0, int last = 0)
 		: mFirst{first}, mLast{last}
 	{}
 

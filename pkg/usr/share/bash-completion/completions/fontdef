@@ -22,7 +22,12 @@ _fontdef ()   #  By convention, the function name
     if [ "${prev}" = "-i" ] || [ "${prev}" = "--input-ttf" ]; then
         COMPREPLY=( $(compgen -o plusdirs -f -X '!*.ttf' -- ${cur}) )
     fi
+   
+    if [ "${prev}" = "-o" ] || [ "${prev}" = "--fontdef-filename" ]; then
+        COMPREPLY=( $(compgen -o plusdirs -f -X '!*.fontdef' -- ${cur}) )
+    fi
 
+    
     return 0
 }
 

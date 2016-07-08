@@ -1,4 +1,5 @@
 #include "codepoint.h"
+#include <iostream>
 using namespace std;
 
 bool operator ==(const CodePointRange& lhs, const CodePointRange& rhs)
@@ -6,7 +7,7 @@ bool operator ==(const CodePointRange& lhs, const CodePointRange& rhs)
 	return (lhs.first() == rhs.first()) && (lhs.last() != rhs.last());
 }
 
-ostream& operator <<(ostream& os, const CodePointRange& cp)
+ostream& operator << (ostream& os, const CodePointRange& cp)
 {
 	os << cp.first() << '-' << cp.last();
 	return os;

@@ -6,6 +6,13 @@ using namespace std;
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <boost/filesystem.hpp>
+
+boost::filesystem::path getFilenameWithoutExtension(const boost::filesystem::path& p)
+{
+	boost::filesystem::path result = p;
+	return result.replace_extension("");
+}
 
 ProgramOptions::ProgramOptions(int argc, char* argv[])
 {
@@ -18,13 +25,11 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 po::value<string>(&mInputFont),
 			 "input ttf filename")
 
-			("fontname,n",
+			("title-font-resource,t",
 			 po::value<string>(&mFontName),
 			 "name of font to use")
 
 			("image-filename,f",
-			 po::value<string>(&mImageFilename)
-			 ->default_value("image.bmp"),
 			 "output image filename")
 
 			("size,s", po::value<int>(&mSize)
@@ -36,7 +41,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 ->default_value(96),
 			 "resolution in dpi")
 
-			("output,o",
+			("fontdef-filename,o",
 			 po::value<string>(&mOutputFontDef)
 			 ->default_value("out.fontdef"),
 			 "outupt fontdef file")
@@ -51,7 +56,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			("codepoint,c",
 			 po::value<vector<CodePointRange>>(&mCodePoints)
 			 ->multitoken()
-			 ->default_value({{33,166}}, "33-166"),"range of cod points");				;
+			 ->default_value(CodePoints{CodePointRange{33,166}}, "33-166"),"range of cod points");				;
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
@@ -65,10 +70,18 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		return;
 	}
 
-	if (vm.count("image-filename"))
+	if (!exist("image-filename"))
 	{
-		if ((int)verboseLevel() >= (int)LogLevel::MEDIUM)
-			cout << "image-filename not set default is: " << output() << endl;
+		ostringstream os;
+
+		mImageFilename = vm["input-ttf"].as<std::string>();
+
+		boost::filesystem::path p{mInputFont};
+
+		os << getFilenameWithoutExtension(p.filename()).c_str()
+		   << '_' << size() << '_' << resolution() << ".png";
+
+		mImageFilename = os.str();
 	}
 
 	bool must_throw = false;
@@ -80,7 +93,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		must_throw = true;
 	}
 
-	if (!exist("fontname"))
+	if (!exist("fontdef-filename"))
 	{
 		os << "missing font arguments!\n";
 		must_throw = true;
@@ -101,21 +114,21 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 
 void ProgramOptions::logParameters()
 {
-	if ((int)verboseLevel() >= (int)LogLevel::HIGH)
+	if ((int)verboseLevel() >= (int)LogLevel::MEDIUM)
 	{
 		cout
-				<< "\nfont filename:    " << inputFont()
-				<< "\nfontname:       " << fontName()
-				<< "\noutput image:   " << imageFilename()
-				<< "\nextension:      " << imageExtension()
-				<< "\nresolution:     " << resolution()
-				<< "\nsize:           " << size()
-				<< "\noutput fontdef: " << output()
-				<< "\nappend mode:    " << boolalpha << isAppend()
-				<< "\nverbose level:  " << (int)verboseLevel()
-				<< "\ncode point:     ";
+				<< "\nfont filename:      " << inputFont()
+				<< "\title font resource: " << fontName()
+				<< "\noutput image:       " << imageFilename()
+				<< "\nextension:          " << imageExtension()
+				<< "\nresolution:         " << resolution()
+				<< "\nsize:               " << size()
+				<< "\nfontdef filename:   " << output()
+				<< "\nappend mode:        " << boolalpha << isAppend()
+				<< "\nverbose level:      " << (int)verboseLevel()
+				<< "\ncode point:         ";
 
-		for(const auto& cp : *this)
+		for(const auto& cp : mCodePoints)
 			cout << cp << ' ';
 
 		cout
@@ -149,6 +162,11 @@ const string&ProgramOptions::inputFont() const noexcept
 	return mInputFont;
 }
 
+//const string&ProgramOptions::destPath() const
+//{
+//	return mDestPath;
+//}
+
 int ProgramOptions::size() const noexcept
 {
 	return mSize;
@@ -179,15 +197,20 @@ ProgramOptions::LogLevel ProgramOptions::verboseLevel() const noexcept
 	return static_cast<LogLevel>(mVerboseLevel);
 }
 
-ProgramOptions::CodePointssCIt ProgramOptions::begin() const noexcept
+const ProgramOptions::CodePoints&ProgramOptions::codepoints() const noexcept
 {
-	return std::begin(mCodePoints);
+	return mCodePoints;
 }
 
-ProgramOptions::CodePointssCIt ProgramOptions::end() const noexcept
-{
-	return std::end(mCodePoints);
-}
+//ProgramOptions::CodePointssCIt ProgramOptions::cpBegin() const noexcept
+//{
+//	return std::begin(mCodePoints);
+//}
+
+//ProgramOptions::CodePointssCIt ProgramOptions::cpEnd() const noexcept
+//{
+//	return std::end(mCodePoints);
+//}
 
 bool ProgramOptions::exist(const string& str) const noexcept
 {
@@ -196,12 +219,14 @@ bool ProgramOptions::exist(const string& str) const noexcept
 
 void ProgramOptions::extractExtension()
 {
-	auto pointPos = mImageFilename.find_last_of('.');
+	boost::filesystem::path p{mImageFilename};
 
-	if (pointPos == string::npos )
-		throw invalid_argument{"image filename without extension"};
-	if (pointPos + 1 >= mImageFilename.length())
+	if (!p.has_extension())
 		throw invalid_argument{"image filename without extension"};
 
-	mImageExtension = mImageFilename.substr(pointPos+1);
+	auto extWithDot = std::string{p.extension().c_str()};
+	mImageExtension = extWithDot.substr(1);
+
+	// remove the dot .png
+
 }

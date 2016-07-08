@@ -27,19 +27,20 @@ public:
 	const std::string& fontName() const noexcept;
 	const std::string& output() const noexcept;
 	const std::string& inputFont() const noexcept;
+//	const std::string& destPath() const noexcept;
 	int size() const noexcept;
 	int resolution() const noexcept;
 	const std::string& imageFilename() const noexcept;
 	const std::string& imageExtension() const noexcept;
 	bool isAppend() const noexcept;
 	LogLevel verboseLevel() const noexcept;
-	CodePointssCIt begin() const noexcept;
-	CodePointssCIt end() const noexcept;
+	const CodePoints& codepoints() const noexcept;
 
 private:
 	bool exist(const std::string& str) const noexcept;
 	void logParameters();
 	void extractExtension();
+
 
 private:
 	boost::program_options::options_description desc{"Options"};
@@ -48,6 +49,7 @@ private:
 	std::string mInputFont;
 	std::string mOutputFontDef;
 	std::string mFontName;
+//	std::string mDestPath;
 	std::string mImageFilename;
 	std::string mImageExtension;
 	std::vector<CodePointRange> mCodePoints;
