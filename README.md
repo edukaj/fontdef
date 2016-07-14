@@ -36,11 +36,12 @@ fontdef depends from `boost-program-options` and `freeimage` and `freetype`
 ## Linux
 On linux just type 
 
-	sudo apt install libboost-program-options-dev libfreeimage-dev libfreetype6-dev
+	sudo apt install libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libfreeimage-dev libfreetype6-dev
+
 
 or for older Ubuntu (like 14.04 and previous)
 
-	sudo apt-get install libboost-program-options-dev libfreeimage-dev libfreetype6-dev
+	sudo apt-get install libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libfreeimage-dev libfreetype6-dev
 	
 after installed this dependencies follow the instruction below:
 
@@ -72,6 +73,9 @@ must be something like `major.minor-revision` for example
 	sudo dpkg -i fontdef_1.0-0.deb
 
 ## windows
+
+``Not tested``
+
 download that libraries and set fontdef.pro 
 
 Maybe some modification are required. 
