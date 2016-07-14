@@ -79,10 +79,9 @@ void FontdefGenerator::generate()
 	ScopeExit scopedFtFaceDone{[&face] (){ if (face != nullptr) FT_Done_Face(face);}};
 
 	// Convert our point size to freetype 26.6 fixed point format
-
 	FT_F26Dot6 ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
 	const auto ttfResolution = mProgramOptions.resolution();
-	if( FT_Set_Char_Size( face, ttfSize, 0, ttfResolution, ttfResolution ) )
+	if( FT_Set_Char_Size( face, ttfSize * 2, ttfSize, ttfResolution, ttfResolution ) )
 		throw std::runtime_error{"unable to set char size"};
 
 	int max_width = 0;

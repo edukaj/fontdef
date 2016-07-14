@@ -52,7 +52,6 @@ private:
 	std::string mInputFont;
 	std::string mOutputFontDef;
 	std::string mFontName;
-//	std::string mDestPath;
 	std::string mImageFilename;
 	std::string mImageExtension;
 	std::vector<CodePointRange> mCodePoints;
