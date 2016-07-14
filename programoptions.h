@@ -14,9 +14,9 @@ public:
 
 	ProgramOptions(int argc, char* argv[]);
 
-	bool showOnlyHelp() const noexcept;
-
 	friend std::ostream& operator << (std::ostream& os, const ProgramOptions& po);
+
+	bool showOnlyUsage() const noexcept;
 
 	const std::string& fontName() const noexcept;
 	const std::string& output() const noexcept;
@@ -34,9 +34,11 @@ public:
 	const CodePoints& codepoints() const noexcept;
 
 private:
+	bool mustDisplayOnlyHelp(int argc) const noexcept;
+	void fillDescription();
+	void extractImageFilenameAndExtension();
 	bool exist(const std::string& str) const noexcept;
 	void logParameters();
-	void extractExtension();
 
 private:
 	boost::program_options::options_description desc{"Options"};
@@ -53,7 +55,7 @@ private:
 	int mCharSpace;
 	int mVerboseLevel;
 	int mPixelSize;
-	bool mShowOnlyHelp = false;
-	bool mIsAppend = false;
+	bool mIsAppend;
 	bool mUseAntialiasColor;
+	mutable bool mShowOnlyUsage;
 };

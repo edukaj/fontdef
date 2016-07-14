@@ -16,6 +16,7 @@
 #include "fontdefgenerator.h"
 
 using namespace std;
+using namespace std::literals::string_literals;
 
 class ScopeExit {
 public:
@@ -26,7 +27,6 @@ private:
 };
 
 
-using namespace std::literals::string_literals;
 
 std::ostream& operator << (std::ostream& os, FT_Face face)
 {
@@ -67,17 +67,15 @@ void FontdefGenerator::generate()
 
 	if (FT_Init_FreeType(&ftLib))
 		throw runtime_error{"unable to init FreeType"};
-
 	ScopeExit scopedFtDone{[&ftLib] (){ if (ftLib != nullptr) FT_Done_FreeType(ftLib);}};
 
 	FT_Face face;
 	if (FT_New_Face(ftLib, mProgramOptions.inputFont().c_str(), 0, &face ))
 		throw runtime_error{"unable to init font face"};
-
 	ScopeExit scopedFtFaceDone{[&face] (){ if (face != nullptr) FT_Done_Face(face);}};
 
 	// Convert our point size to freetype 26.6 fixed point format
-	const FT_F26Dot6 ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
+	const auto ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
 	const auto ttfResolution = mProgramOptions.resolution();
 
 	if( FT_Set_Char_Size( face, ttfSize, 0, ttfResolution, ttfResolution ) )
@@ -292,7 +290,6 @@ void FontdefGenerator::createFontDef()
 
 int FontdefGenerator::extractFreeImageExtensionFrom(const std::string& ext)
 {
-
 	auto freeImageExt = FIF_BMP;
 
 	if (ext == "bmp"s)
@@ -307,8 +304,6 @@ int FontdefGenerator::extractFreeImageExtensionFrom(const std::string& ext)
 		freeImageExt = FIF_TARGA;
 	else if (ext == "tiff"s)
 		freeImageExt = FIF_TIFF;
-	else if (ext == "dds"s)
-		freeImageExt = FIF_DDS;
 	else
 		throw std::invalid_argument{ ext + " is an unsuppordet image extension"s};
 

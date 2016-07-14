@@ -8,6 +8,8 @@ using namespace std;
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+namespace po = boost::program_options;
+
 boost::filesystem::path getFilenameWithoutExtension(const boost::filesystem::path& p)
 {
 	boost::filesystem::path result = p;
@@ -16,123 +18,33 @@ boost::filesystem::path getFilenameWithoutExtension(const boost::filesystem::pat
 
 ProgramOptions::ProgramOptions(int argc, char* argv[])
 {
-	namespace po = boost::program_options;
-
-	desc.add_options()
-			("help,h", "produce this message")
-
-			("input-ttf,i",
-			 po::value<string>(&mInputFont),
-			 "input ttf filename")
-
-			("title-font-resource,t",
-			 po::value<string>(&mFontName),
-			 "name of font to use")
-
-			("image-filename,f",
-			 po::value<string>(&mImageFilename),
-			 "output image filename")
-
-			("size,s", po::value<float>(&mSize)
-			 ->default_value(32.0),
-			 "True type size")
-
-			("resolution,r",
-			 po::value<int>(&mResolution)
-			 ->default_value(96),
-			 "True type resolution")
-
-			("charachter-space",
-			 po::value<int>(&mCharSpace)
-			 ->default_value(5),
-			 "Spacing between characters to prevent overlap artifacts")
-
-			("pixel-size",
-			 po::value<int>(&mPixelSize)
-			 ->default_value(1),
-			 "pixel size in bytes of output image")
-
-			("fontdef-filename,o",
-			 po::value<string>(&mOutputFontDef)
-			 ->default_value("out.fontdef"),
-			 "outupt fontdef file")
-
-			("append,a",
-			 po::value<bool>(&mIsAppend)
-			 ->default_value(false),
-			 "use if you want to append to an existing fontdef")
-
-			("verbose,v",
-			 po::value<int>(&mVerboseLevel)
-			 ->default_value(0),
-			 "verbose level [0-3]")
-
-			("use-antialias-color",
-			 po::value<bool>(&mUseAntialiasColor)
-			 ->default_value(false),
-			 "use antialias color")
-
-			("codepoint,c",
-			 po::value<vector<CodePointRange>>(&mCodePoints)
-			 ->multitoken()
-			 ->default_value(CodePoints{CodePointRange{33,166}}, "33-166"),"range of cod points nn-nn ...");				;
-
+	fillDescription();
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
-	if (exist("help") || (argc == 1))
-		mShowOnlyHelp = true;
-
-	if (showOnlyHelp())
+	if (mustDisplayOnlyHelp(argc))
 	{
 		cout << desc << endl;
+		mShowOnlyUsage = true;
 		return;
 	}
 
-	if (!exist("image-filename"))
-	{
-		ostringstream os;
-
-		mImageFilename = vm["input-ttf"].as<string>();
-
-		boost::filesystem::path p{mInputFont};
-
-		os << getFilenameWithoutExtension(p.filename()).c_str()
-		   << '_' << size() << '_' << resolution() << ".png";
-
-		mImageFilename = os.str();
-	}
-
-	bool must_throw = false;
-	ostringstream os;
+	extractImageFilenameAndExtension();
 
 	if (!exist("input-ttf"))
 	{
+		ostringstream os;
 		os << "missing filename arguments!\n";
-		must_throw = true;
-	}
-
-	if (!exist("fontdef-filename"))
-	{
-		os << "missing font arguments!\n";
-		must_throw = true;
-	}
-
-	if (!exist("title-font-resource"))
-	{
-		os << "missing font title resource\n";
-		must_throw = true;
-	}
-
-	if (must_throw)
-	{
 		os << *this << endl;
 		throw invalid_argument{os.str()};
 	}
 
-	extractExtension();
-
 	logParameters();
+}
+
+bool ProgramOptions::showOnlyUsage() const noexcept
+{
+	return mShowOnlyUsage;
 }
 
 void ProgramOptions::logParameters()
@@ -159,11 +71,6 @@ void ProgramOptions::logParameters()
 
 		cout << endl;
 	}
-}
-
-bool ProgramOptions::showOnlyHelp() const noexcept
-{
-	return mShowOnlyHelp;
 }
 
 ostream& operator << (ostream& os, const ProgramOptions& po)
@@ -236,13 +143,90 @@ const ProgramOptions::CodePoints&ProgramOptions::codepoints() const noexcept
 	return mCodePoints;
 }
 
-bool ProgramOptions::exist(const string& str) const noexcept
+bool ProgramOptions::mustDisplayOnlyHelp(int argc) const noexcept
 {
-	return vm.find(str) != std::end(vm);
+		return vm.count("help") != 0 || argc == 1;
 }
 
-void ProgramOptions::extractExtension()
+void ProgramOptions::fillDescription()
 {
+	desc.add_options()
+			("help,h", "produce this message")
+
+			("input-ttf,i",
+			 po::value<string>(&mInputFont),
+			 "input ttf filename")
+
+			("title-font-resource,t",
+			 po::value<string>(&mFontName)
+			 ->default_value("Font"s),
+			 "name of font to use")
+
+			("image-filename,f",
+			 po::value<string>(&mImageFilename),
+			 "output image filename")
+
+			("size,s", po::value<float>(&mSize)
+			 ->default_value(32.0),
+			 "True type size")
+
+			("resolution,r",
+			 po::value<int>(&mResolution)
+			 ->default_value(96),
+			 "True type resolution")
+
+			("charachter-space",
+			 po::value<int>(&mCharSpace)
+			 ->default_value(5),
+			 "Spacing between characters to prevent overlap artifacts")
+
+			("pixel-size",
+			 po::value<int>(&mPixelSize)
+			 ->default_value(1),
+			 "pixel size in bytes of output image")
+
+			("fontdef-filename,o",
+			 po::value<string>(&mOutputFontDef)
+			 ->default_value("out.fontdef"),
+			 "outupt fontdef file")
+
+			("append,a",
+			 po::value<bool>(&mIsAppend)
+			 ->default_value(false, "false"s),
+			 "use if you want to append to an existing fontdef")
+
+			("verbose,v",
+			 po::value<int>(&mVerboseLevel)
+			 ->default_value(0),
+			 "verbose level [0-3]")
+
+			("use-antialias-color",
+			 po::value<bool>(&mUseAntialiasColor)
+			 ->default_value(false),
+			 "use antialias color")
+
+			("codepoint,c",
+			 po::value<vector<CodePointRange>>(&mCodePoints)
+			 ->multitoken()
+			 ->default_value(CodePoints{CodePointRange{33,166}}, "33-166"),"range of cod points nn-nn ...");
+}
+
+void ProgramOptions::extractImageFilenameAndExtension()
+{
+	if (!exist("image-filename"))
+	{
+		ostringstream os;
+
+		mImageFilename = vm["input-ttf"].as<string>();
+
+		boost::filesystem::path p{mInputFont};
+
+		os << getFilenameWithoutExtension(p.filename()).c_str()
+		   << '_' << size() << '_' << resolution() << ".png";
+
+		mImageFilename = os.str();
+	}
+
 	boost::filesystem::path p{mImageFilename};
 
 	if (!p.has_extension())
@@ -250,4 +234,9 @@ void ProgramOptions::extractExtension()
 
 	auto extWithDot = std::string{p.extension().c_str()};
 	mImageExtension = extWithDot.substr(1);
+}
+
+bool ProgramOptions::exist(const string& str) const noexcept
+{
+	return vm.find(str) != std::end(vm);
 }

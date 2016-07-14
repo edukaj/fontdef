@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
 		FontdefGenerator fontdefGen{po};
 
-		if (!po.showOnlyHelp())
+		if (!po.showOnlyUsage())
 			fontdefGen.generate();
 	}
 	catch(const exception& exc)
