@@ -30,16 +30,27 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 "name of font to use")
 
 			("image-filename,f",
+			 po::value<string>(&mImageFilename),
 			 "output image filename")
 
-			("size,s", po::value<int>(&mSize)
-			 ->default_value(32),
-			 "size of font in pixels")
+			("size,s", po::value<float>(&mSize)
+			 ->default_value(32.0),
+			 "True type size")
 
 			("resolution,r",
 			 po::value<int>(&mResolution)
 			 ->default_value(96),
-			 "resolution in dpi")
+			 "True type resolution")
+
+			("charachter-space",
+			 po::value<int>(&mCharSpace)
+			 ->default_value(5),
+			 "Spacing between characters to prevent overlap artifacts")
+
+			("pixel-size",
+			 po::value<int>(&mPixelSize)
+			 ->default_value(1),
+			 "pixel size in bytes of output image")
 
 			("fontdef-filename,o",
 			 po::value<string>(&mOutputFontDef)
@@ -50,13 +61,19 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 "use if you want to append to an existing fontdef")
 
 			("verbose,v",
-			 po::value<int>(&mVerboseLevel)->default_value(false),
+			 po::value<int>(&mVerboseLevel)
+			 ->default_value(0),
 			 "verbose level [0-3]")
+
+			("use-antialias-color",
+			 po::value<bool>(&mUseAntialiasColor)
+			 ->default_value(false),
+			 "use antialias color")
 
 			("codepoint,c",
 			 po::value<vector<CodePointRange>>(&mCodePoints)
 			 ->multitoken()
-			 ->default_value(CodePoints{CodePointRange{33,166}}, "33-166"),"range of cod points");				;
+			 ->default_value(CodePoints{CodePointRange{33,166}}, "33-166"),"range of cod points nn-nn ...");				;
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
@@ -74,7 +91,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 	{
 		ostringstream os;
 
-		mImageFilename = vm["input-ttf"].as<std::string>();
+		mImageFilename = vm["input-ttf"].as<string>();
 
 		boost::filesystem::path p{mInputFont};
 
@@ -117,23 +134,24 @@ void ProgramOptions::logParameters()
 	if ((int)verboseLevel() >= (int)LogLevel::MEDIUM)
 	{
 		cout
-				<< "\nfont filename:      " << inputFont()
-				<< "\title font resource: " << fontName()
-				<< "\noutput image:       " << imageFilename()
-				<< "\nextension:          " << imageExtension()
-				<< "\nresolution:         " << resolution()
-				<< "\nsize:               " << size()
-				<< "\nfontdef filename:   " << output()
-				<< "\nappend mode:        " << boolalpha << isAppend()
-				<< "\nverbose level:      " << (int)verboseLevel()
-				<< "\ncode point:         ";
+				<< "\nfont filename:       " << inputFont()
+				<< "\ntitle font resource: " << fontName()
+				<< "\noutput image:        " << imageFilename()
+				<< "\nextension:           " << imageExtension()
+				<< "\nsize:                " << size()
+				<< "\nresolution:          " << resolution()
+				<< "\ncharchter space:     " << charachterSpace()
+				<< "\npixel size:          " << pixelSize()
+				<< "\nfontdef filename:    " << output()
+				<< "\nappend mode:         " << boolalpha << isAppend()
+				<< "\nuse antialias color: " << boolalpha << useAntialiasColor()
+				<< "\nverbose level:       " << (int)verboseLevel()
+				<< "\ncode point:          ";
 
 		for(const auto& cp : mCodePoints)
 			cout << cp << ' ';
 
-		cout
-				<< "\nverbose level:  " << static_cast<int>(verboseLevel())
-				<< endl;
+		cout << endl;
 	}
 }
 
@@ -162,12 +180,7 @@ const string&ProgramOptions::inputFont() const noexcept
 	return mInputFont;
 }
 
-//const string&ProgramOptions::destPath() const
-//{
-//	return mDestPath;
-//}
-
-int ProgramOptions::size() const noexcept
+float ProgramOptions::size() const noexcept
 {
 	return mSize;
 }
@@ -175,6 +188,21 @@ int ProgramOptions::size() const noexcept
 int ProgramOptions::resolution() const noexcept
 {
 	return mResolution;
+}
+
+int ProgramOptions::charachterSpace() const noexcept
+{
+	return mCharSpace;
+}
+
+int ProgramOptions::pixelSize() const noexcept
+{
+	return mPixelSize;
+}
+
+bool ProgramOptions::useAntialiasColor() const noexcept
+{
+	return mUseAntialiasColor;
 }
 
 const string&ProgramOptions::imageFilename() const noexcept
@@ -202,16 +230,6 @@ const ProgramOptions::CodePoints&ProgramOptions::codepoints() const noexcept
 	return mCodePoints;
 }
 
-//ProgramOptions::CodePointssCIt ProgramOptions::cpBegin() const noexcept
-//{
-//	return std::begin(mCodePoints);
-//}
-
-//ProgramOptions::CodePointssCIt ProgramOptions::cpEnd() const noexcept
-//{
-//	return std::end(mCodePoints);
-//}
-
 bool ProgramOptions::exist(const string& str) const noexcept
 {
 	return vm.find(str) != std::end(vm);
@@ -226,7 +244,4 @@ void ProgramOptions::extractExtension()
 
 	auto extWithDot = std::string{p.extension().c_str()};
 	mImageExtension = extWithDot.substr(1);
-
-	// remove the dot .png
-
 }

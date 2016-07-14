@@ -27,9 +27,12 @@ public:
 	const std::string& fontName() const noexcept;
 	const std::string& output() const noexcept;
 	const std::string& inputFont() const noexcept;
-//	const std::string& destPath() const noexcept;
-	int size() const noexcept;
+	float size() const noexcept;
 	int resolution() const noexcept;
+	int charachterSpace() const noexcept;
+	int pixelSize() const noexcept;
+	bool useAntialiasColor() const noexcept;
+
 	const std::string& imageFilename() const noexcept;
 	const std::string& imageExtension() const noexcept;
 	bool isAppend() const noexcept;
@@ -53,10 +56,12 @@ private:
 	std::string mImageFilename;
 	std::string mImageExtension;
 	std::vector<CodePointRange> mCodePoints;
-	int mSize;
+	float mSize;
 	int mResolution;
-
-	int mVerboseLevel = 0;
+	int mCharSpace;
+	int mVerboseLevel;
+	int mPixelSize;
 	bool mShowOnlyHelp = false;
 	bool mIsAppend = false;
+	bool mUseAntialiasColor;
 };

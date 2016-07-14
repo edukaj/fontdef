@@ -4,6 +4,8 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <functional>
+#include <algorithm>
 
 #include <boost/algorithm/string.hpp>
 #include <ft2build.h>
@@ -12,6 +14,19 @@
 #include <FreeImage.h>
 
 #include "fontdefgenerator.h"
+
+using namespace std;
+
+class ScopeExit {
+public:
+	ScopeExit(std::function<void()> f): f_(f) {}
+	~ScopeExit() { f_(); }
+private:
+	std::function<void()> f_;
+};
+
+
+using namespace std::literals::string_literals;
 
 std::ostream& operator << (std::ostream& os, FT_Face face)
 {
@@ -53,16 +68,21 @@ void FontdefGenerator::generate()
 	FT_Library ftLib = nullptr;
 
 	if (FT_Init_FreeType(&ftLib))
-		throw std::runtime_error{"unable to init FreeType"};
+		throw runtime_error{"unable to init FreeType"};
+
+	ScopeExit scopedFtDone{[&ftLib] () { if (ftLib != nullptr) FT_Done_FreeType(ftLib);}};
 
 	FT_Face face;
 	if (FT_New_Face(ftLib, mProgramOptions.inputFont().c_str(), 0, &face ))
-		throw std::runtime_error{"unable to init font face"};
+		throw runtime_error{"unable to init font face"};
+
+	ScopeExit scopedFtFaceDone{[&face] (){ if (face != nullptr) FT_Done_Face(face);}};
 
 	// Convert our point size to freetype 26.6 fixed point format
 
-	FT_F26Dot6 ftSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
-	if( FT_Set_Char_Size( face, ftSize, 0, mProgramOptions.resolution(), mProgramOptions.resolution() ) )
+	FT_F26Dot6 ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
+	const auto ttfResolution = mProgramOptions.resolution();
+	if( FT_Set_Char_Size( face, ttfSize, 0, ttfResolution, ttfResolution ) )
 		throw std::runtime_error{"unable to set char size"};
 
 	int max_width = 0;
@@ -87,13 +107,12 @@ void FontdefGenerator::generate()
 		}
 	}
 
-	auto character_spacer = 2;
+	const auto character_spacer = mProgramOptions.charachterSpace();
 
 	// Now work out how big our texture needs to be
-	size_t rawSize = (max_width + character_spacer) *
-						((max_height >> 6) + character_spacer) * glyphCount;
+	size_t rawSize = (max_width + character_spacer) * ((max_height >> 6) + character_spacer) * glyphCount;
 
-	uint32_t tex_side = static_cast<uint32_t>(sqrt((double)rawSize));
+	uint32_t tex_side = static_cast<uint32_t>(std::sqrt((Real)rawSize));
 	// just in case the size might chop a glyph in half, add another glyph width/height
 	tex_side += std::max(max_width, (max_height>>6));
 	uint32_t roundUpSize = firstPO2From(tex_side);
@@ -101,19 +120,16 @@ void FontdefGenerator::generate()
 	// Would we benefit from using a non-square texture (2X width)
 	uint32_t finalWidth, finalHeight;
 	if (roundUpSize * roundUpSize * 0.5 >= rawSize)
-	{
 		finalHeight = static_cast<uint32_t>(roundUpSize * 0.5);
-	}
 	else
-	{
 		finalHeight = roundUpSize;
-	}
+
 	finalWidth = roundUpSize;
 
 	if ((int)mProgramOptions.verboseLevel() >= (int)ProgramOptions::LogLevel::HIGH)
 		std::cout
 			 << "\nmax width:     " << max_width
-			 << "\nmax height:    " << max_height
+			 << "\nmax height:    " << (max_height >> 6)
 			 << "\nmax Y bearing: " << max_bearing_y
 			 << "\nraw size:      " << rawSize
 			 << "\ntexture side:  " << tex_side
@@ -123,15 +139,21 @@ void FontdefGenerator::generate()
 			 << '\n'
 			 << std::endl;
 
-	auto textureAspect = (double)finalWidth / (double)finalHeight;
+	auto textureAspect = (Real)finalWidth / (Real)finalHeight;
 
-	const size_t pixel_bytes = 1;
+	const auto pixel_bytes = mProgramOptions.pixelSize();
 	size_t data_width = finalWidth * pixel_bytes;
 	size_t data_size = finalWidth * finalHeight * pixel_bytes;
 
-	size_t l = 0, m = 0;
+	std::vector<uint8_t> imageData(data_size, 0);
 
-	std::vector<uint8_t> imageData(data_size);
+	if (pixel_bytes == 2)
+	{
+		for (size_t i = 0; i < data_size; i += pixel_bytes)
+			imageData[i] = 0xFF; // luminance
+	}
+
+	size_t x = 0, y = 0;
 
 	glyphCount = 0;
 	for( const auto& codepoint : mProgramOptions.codepoints() )
@@ -144,6 +166,7 @@ void FontdefGenerator::generate()
 				continue;
 			}
 
+			FT_Pos advance = face->glyph->advance.x >> 6;
 			unsigned char* buffer = face->glyph->bitmap.buffer;
 
 			if (!buffer)
@@ -153,44 +176,64 @@ void FontdefGenerator::generate()
 						   << mProgramOptions.inputFont() << std::endl;
 				continue;
 			}
-
 			++glyphCount;
-			FT_Pos advance = face->glyph->advance.x >> 6;
+
 			FT_Pos y_bearing = ( max_bearing_y >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
 			FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
-			for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
+			if (pixel_bytes == 2)
 			{
-				size_t row = j + m + y_bearing;
-				uint8_t* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
-				for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
-					*pDest++= *buffer++;
+				for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
+				{
+					size_t row = j + y + y_bearing;
+					uint8_t* pDest = &imageData[(row * data_width) + (x + x_bearing) * pixel_bytes];
+
+					for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
+					{
+						if (mProgramOptions.useAntialiasColor())
+							*pDest++= *buffer++;
+						else
+							*pDest++= 0xFF;
+						// Always use the greyscale value for alpha
+						*pDest++= *buffer++;
+					}
+				}
+			}
+			else
+			{
+				for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
+				{
+					size_t row = j + y + y_bearing;
+					uint8_t* pDest = &imageData[(row * data_width) + (x + x_bearing) * pixel_bytes];
+
+//					copy(begin(buffer), begin(bufffer) + face->glyph->bitmap.width, begin(pDest));
+
+					for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
+						*pDest++= *buffer++;
+				}
 			}
 
 			setGlyphTexCoords(i,
-							  (double)l / (double)finalWidth,  // u1
-							  (double)m / (Real)finalHeight,  // v1
-							  (double)( l + ( face->glyph->advance.x >> 6 ) ) / (Real)finalWidth, // u2
-							  ( m + ( max_height >> 6 ) ) / (Real)finalHeight, // v2
+							  (Real)x / (Real)finalWidth,  // u1
+							  (Real)y / (Real)finalHeight,  // v1
+							  (Real)( x + ( face->glyph->advance.x >> 6 ) ) / (Real)finalWidth, // u2
+							  ( y + ( max_height >> 6 ) ) / (Real)finalHeight, // v2
 							  textureAspect
 							  );
 
 			// Advance a column
-			l += (advance + character_spacer);
+			x += (advance + character_spacer);
 
 			// If at end of row
-			if( finalWidth - 1 < l + ( advance ) )
+			if( finalWidth - 1 < x + ( advance ) )
 			{
-				m += ( max_height >> 6 ) + character_spacer;
-				l = 0;
+				y += ( max_height >> 6 ) + character_spacer;
+				x = 0;
 			}
 		}
 	}
-	if (ftLib != nullptr)
-		FT_Done_FreeType(ftLib);
 
-	int bpp = 8;
-	saveFontImage(imageData, finalWidth, finalHeight, bpp,
+	saveFontImage(imageData, finalWidth, finalHeight, pixel_bytes * 8,
 				  boost::algorithm::to_lower_copy(mProgramOptions.imageExtension()));
 
 	if ((int)mProgramOptions.verboseLevel() >= (int)ProgramOptions::LogLevel::MEDIUM)
@@ -249,21 +292,25 @@ void FontdefGenerator::createFontDef()
 
 int FontdefGenerator::extractFreeImageExtensionFrom(const std::string& ext)
 {
+
 	auto freeImageExt = FIF_BMP;
 
-	if (ext == std::string{"bmp"})
+	if (ext == "bmp"s)
 		freeImageExt = FIF_BMP;
-	else if (ext == std::string{"png"})
+	else if (ext == "png"s)
 		freeImageExt = FIF_PNG;
-	else if (ext == std::string{"jpg"})
+	else if (ext == "jpg"s)
 		freeImageExt = FIF_JPEG;
-	else if (ext == std::string{"jpeg"})
+	else if (ext == "jpeg"s)
 		freeImageExt = FIF_JPEG;
-	else if (ext == std::string{"tga"})
+	else if (ext == "tga"s)
 		freeImageExt = FIF_TARGA;
-	else if (ext == std::string{"tiff"})
+	else if (ext == "tiff"s)
 		freeImageExt = FIF_TIFF;
-	else throw std::invalid_argument{"unsuppordet image extension"};
+	else if (ext == "dds"s)
+		freeImageExt = FIF_DDS;
+	else
+		throw std::invalid_argument{ ext + " is an unsuppordet image extension"s};
 
 	return freeImageExt;
 }

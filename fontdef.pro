@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++11
+CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -35,7 +35,7 @@ win32-msvc2015 {
 
 unix {
     CONFIG += link_pkgconfig
-    PKGCONFIG += freetype2
+    PKGCONFIG += freetype2 opencv
 
     LIBS += -lpthread -lboost_program_options -lboost_filesystem -lboost_system -lfreeimage
 }
