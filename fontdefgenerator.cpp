@@ -61,8 +61,6 @@ static inline uint32_t firstPO2From(uint32_t n)
 	return n;
 }
 
-
-
 void FontdefGenerator::generate()
 {
 	FT_Library ftLib = nullptr;
@@ -70,7 +68,7 @@ void FontdefGenerator::generate()
 	if (FT_Init_FreeType(&ftLib))
 		throw runtime_error{"unable to init FreeType"};
 
-	ScopeExit scopedFtDone{[&ftLib] () { if (ftLib != nullptr) FT_Done_FreeType(ftLib);}};
+	ScopeExit scopedFtDone{[&ftLib] (){ if (ftLib != nullptr) FT_Done_FreeType(ftLib);}};
 
 	FT_Face face;
 	if (FT_New_Face(ftLib, mProgramOptions.inputFont().c_str(), 0, &face ))
@@ -79,9 +77,10 @@ void FontdefGenerator::generate()
 	ScopeExit scopedFtFaceDone{[&face] (){ if (face != nullptr) FT_Done_Face(face);}};
 
 	// Convert our point size to freetype 26.6 fixed point format
-	FT_F26Dot6 ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
+	const FT_F26Dot6 ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
 	const auto ttfResolution = mProgramOptions.resolution();
-	if( FT_Set_Char_Size( face, ttfSize * 2, ttfSize, ttfResolution, ttfResolution ) )
+
+	if( FT_Set_Char_Size( face, ttfSize, 0, ttfResolution, ttfResolution ) )
 		throw std::runtime_error{"unable to set char size"};
 
 	int max_width = 0;
@@ -166,7 +165,7 @@ void FontdefGenerator::generate()
 			}
 
 			FT_Pos advance = face->glyph->advance.x >> 6;
-			unsigned char* buffer = face->glyph->bitmap.buffer;
+			const uint8_t* buffer = face->glyph->bitmap.buffer;
 
 			if (!buffer)
 			{
@@ -175,8 +174,8 @@ void FontdefGenerator::generate()
 						   << mProgramOptions.inputFont() << std::endl;
 				continue;
 			}
-			++glyphCount;
 
+			++glyphCount;
 			FT_Pos y_bearing = ( max_bearing_y >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
 			FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
@@ -200,15 +199,17 @@ void FontdefGenerator::generate()
 			}
 			else
 			{
-				for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
+				const size_t bitmapRows =  face->glyph->bitmap.rows;
+				const size_t bitmapWidth = face->glyph->bitmap.width;
+
+				uint8_t* pDest = &imageData[((y + y_bearing) * data_width) + (x + x_bearing) * pixel_bytes];
+
+				for(unsigned int j = 0; j < bitmapRows; j++, buffer += bitmapWidth, pDest += bitmapWidth)
 				{
-					size_t row = j + y + y_bearing;
+					const size_t row = j + y + y_bearing;
 					uint8_t* pDest = &imageData[(row * data_width) + (x + x_bearing) * pixel_bytes];
 
-//					copy(begin(buffer), begin(bufffer) + face->glyph->bitmap.width, begin(pDest));
-
-					for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
-						*pDest++= *buffer++;
+					copy(buffer, buffer + bitmapWidth, pDest);
 				}
 			}
 

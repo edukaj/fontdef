@@ -35,7 +35,7 @@ win32-msvc2015 {
 
 unix {
     CONFIG += link_pkgconfig
-    PKGCONFIG += freetype2 opencv
+    PKGCONFIG += freetype2
 
     LIBS += -lpthread -lboost_program_options -lboost_filesystem -lboost_system -lfreeimage
 }

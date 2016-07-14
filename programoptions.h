@@ -6,17 +6,11 @@
 
 class ProgramOptions {
 public:
-
 	using CodePoints = std::vector< CodePointRange >;
 	using CodePointssCIt = CodePoints::const_iterator;
 
-	enum class FileFormat {
-		BMP, JPEG, PNG, DDS
-	};
-
-	enum class LogLevel {
-		NONE, LOW, MEDIUM, HIGH
-	};
+	enum class FileFormat { BMP, JPEG, PNG, DDS };
+	enum class LogLevel { NONE, LOW, MEDIUM, HIGH };
 
 	ProgramOptions(int argc, char* argv[]);
 
@@ -43,7 +37,6 @@ private:
 	bool exist(const std::string& str) const noexcept;
 	void logParameters();
 	void extractExtension();
-
 
 private:
 	boost::program_options::options_description desc{"Options"};

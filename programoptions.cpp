@@ -58,6 +58,8 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 			 "outupt fontdef file")
 
 			("append,a",
+			 po::value<bool>(&mIsAppend)
+			 ->default_value(false),
 			 "use if you want to append to an existing fontdef")
 
 			("verbose,v",
@@ -78,7 +80,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 
-	if (vm.count("help"))
+	if (exist("help") || (argc == 1))
 		mShowOnlyHelp = true;
 
 	if (showOnlyHelp())
@@ -116,7 +118,11 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		must_throw = true;
 	}
 
-	mIsAppend = exist("append");
+	if (!exist("title-font-resource"))
+	{
+		os << "missing font title resource\n";
+		must_throw = true;
+	}
 
 	if (must_throw)
 	{
