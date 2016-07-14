@@ -7,27 +7,23 @@ The generated image as power of two side dimensions.
 
 # usage
 
-    -h [ --help ]                         produce this message
-    -i [ --input-ttf ] arg                input ttf filename
-    -n [ --fontname ] arg                 name of font to use
-    -f [ --image-filename ] arg (=image.bmp)
-                                          output image filename
-    -s [ --size ] arg (=32)               size of font in pixels
-    -r [ --resolution ] arg (=96)         resolution in dpi
-    -o [ --output ] arg (=out.fontdef)    outupt fontdef file
-    -a [ --append ]                       use if you want to append to an 
-                                          existing fontdef
-    -v [ --verbose ] arg (=0)             verbose level [0-3]
-    -c [ --codepoint ] arg (=33-166)      range of cod points
+	-h [ --help ]                         produce this message
+	-i [ --input-ttf ] arg                input ttf filename
+	-t [ --title-font-resource ] arg      name of font to use
+	-f [ --image-filename ] arg           output image filename
+	-s [ --size ] arg (=32)               True type size
+	-r [ --resolution ] arg (=96)         True type resolution
+	--charachter-space arg (=5)           Spacing between characters to prevent 
+	                                      overlap artifacts
+	--pixel-size arg (=1)                 pixel size in bytes of output image
+	-o [ --fontdef-filename ] arg (=out.fontdef)
+	                                      outupt fontdef file
+	-a [ --append ]                       use if you want to append to an 
+	                                      existing fontdef
+	-v [ --verbose ] arg (=0)             verbose level [0-3]
+	--use-antialias-color arg (=0)        use antialias color
+	-c [ --codepoint ] arg (=33-166)      range of cod points nn-nn ...
 
-* `--input-ttf`: ttf font filename
-* `--fontname`: title of the font used by Ogre 
-* `--image-filename`: image filename containg all glyphs. The filename must contain a valid extension between `bmp`, `png`, `tiff`, `jpg`, `jpeg`
-* `--size`: size of the font in pixels
-* `--resolution`: resolution in dpi
-* `--output`: output fontdef filename
-* `--append`: if present all write operation are done in append mode without overwrite existing fontdef content
-* `--codepoints`: list of code points range (for example 33-166 2048-5060 ...)
 
 # Build
 Build this project is really simple just open it with qtcreator and build
@@ -55,9 +51,15 @@ after installed this dependencies follow the instruction below:
         cd build
         qmake ../fontdef.pro -r -spec linux-g++
         make
-        cd ..
+	cd -
+
+To create a redistributable debian package I've also created a simple script:
+        
+	cd ..
         ./build-deb 1.0-1 build/fontdef
         sudo dpkg -i fontdef_1.0-1.deb
+
+In this way you can use the really useful auto-complete when using the utility
 
 ## Package
 I've alse created a bash script called `build-deb` that allow you to 
