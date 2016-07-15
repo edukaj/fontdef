@@ -10,12 +10,14 @@ int main(int argc, char *argv[])
 	{
 		ProgramOptions po(argc, argv);
 
-		FontdefGenerator fontdefGen{po};
 
 		if (po.showOnlyUsage())
 			cout << po << endl;
 		else
+		{
+			FontdefGenerator fontdefGen{po};
 			fontdefGen.generate();
+		}
 	}
 	catch(const exception& exc)
 	{
