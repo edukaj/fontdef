@@ -159,7 +159,7 @@ void ProgramOptions::fillDescription()
 
 			("title-font-resource,t",
 			 po::value<string>(&mFontName)
-			 ->default_value("Font"s),
+			 ->default_value("Font"),
 			 "name of font to use")
 
 			("image-filename,f",
@@ -192,7 +192,7 @@ void ProgramOptions::fillDescription()
 
 			("append,a",
 			 po::value<bool>(&mIsAppend)
-			 ->default_value(false, "false"s),
+			 ->default_value(false, "false"),
 			 "use if you want to append to an existing fontdef")
 
 			("verbose,v",

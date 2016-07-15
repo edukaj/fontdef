@@ -16,7 +16,6 @@
 #include "fontdefgenerator.h"
 
 using namespace std;
-using namespace std::literals::string_literals;
 
 class ScopeExit {
 public:
@@ -292,20 +291,20 @@ int FontdefGenerator::extractFreeImageExtensionFrom(const std::string& ext)
 {
 	auto freeImageExt = FIF_BMP;
 
-	if (ext == "bmp"s)
+	if (ext == "bmp")
 		freeImageExt = FIF_BMP;
-	else if (ext == "png"s)
+	else if (ext == "png")
 		freeImageExt = FIF_PNG;
-	else if (ext == "jpg"s)
+	else if (ext == "jpg")
 		freeImageExt = FIF_JPEG;
-	else if (ext == "jpeg"s)
+	else if (ext == "jpeg")
 		freeImageExt = FIF_JPEG;
-	else if (ext == "tga"s)
+	else if (ext == "tga")
 		freeImageExt = FIF_TARGA;
-	else if (ext == "tiff"s)
+	else if (ext == "tiff")
 		freeImageExt = FIF_TIFF;
 	else
-		throw std::invalid_argument{ ext + " is an unsuppordet image extension"s};
+		throw std::invalid_argument{ ext + " is an unsuppordet image extension"};
 
 	return freeImageExt;
 }
