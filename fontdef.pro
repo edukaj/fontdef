@@ -8,7 +8,7 @@ HEADERS +=  \
             glyphinfo.h \
             rect.h \
             codepoint.h \
-    fontdefgenerator.h
+            fontdefgenerator.h
 
 SOURCES +=  main.cpp \
     programoptions.cpp \

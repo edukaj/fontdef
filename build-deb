@@ -6,29 +6,28 @@ bin=$2
 
 usage() {
 	echo "usage:"
-	echo "build-deb version binary"
+	echo "build-deb version binary [arch=amd64]"
 	echo
 	echo "example build-dev 1.1-0 ../dist/fontdef"
 }
 
-if [ $# -lt 2 ]; then
+if [[ $# -ne 2 && $# -ne 3 ]]; then
 	usage
+	exit 1 
 fi
 
-if [ $# -gt 2 ]; then
-        usage
-fi
 
 folder=fontdef_${version}
 bin_folder=${folder}/usr/bin
 debian=${folder}/DEBIAN
+arch=${3:-amd64}
 
 if [ ! -d ${folder} ]; then
 	mkdir -p ${bin_folder}
 	mkdir ${debian}
 fi
 
-sed "s/version_to_replace/${version}/g" controlTemplate > ${debian}/control
+sed "s/version_to_replace/${version}/g;s/arch/${arch}/g" controlTemplate > ${debian}/control
 cp -r pkg/usr ${folder}
 cp -r ${bin} ${bin_folder}
 

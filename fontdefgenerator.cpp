@@ -66,12 +66,10 @@ void FontdefGenerator::generate()
 
 	if (FT_Init_FreeType(&ftLib))
 		throw runtime_error{"unable to init FreeType"};
-	ScopeExit scopedFtDone{[&ftLib] (){ if (ftLib != nullptr) FT_Done_FreeType(ftLib);}};
 
 	FT_Face face;
 	if (FT_New_Face(ftLib, mProgramOptions.inputFont().c_str(), 0, &face ))
 		throw runtime_error{"unable to init font face"};
-	ScopeExit scopedFtFaceDone{[&face] (){ if (face != nullptr) FT_Done_Face(face);}};
 
 	// Convert our point size to freetype 26.6 fixed point format
 	const auto ttfSize = (FT_F26Dot6)(mProgramOptions.size() * (1 << 6));
@@ -229,6 +227,8 @@ void FontdefGenerator::generate()
 			}
 		}
 	}
+
+	FT_Done_FreeType(ftLib);
 
 	saveFontImage(imageData, finalWidth, finalHeight, pixel_bytes * 8,
 				  boost::algorithm::to_lower_copy(mProgramOptions.imageExtension()));
