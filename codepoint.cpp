@@ -13,7 +13,7 @@ ostream& operator << (ostream& os, const CodePointRange& cp)
 	return os;
 }
 
-istream& operator >>(istream& is, CodePointRange& cp)
+istream& operator >> (istream& is, CodePointRange& cp)
 {
 	std::string toParse;
 	is >> toParse;

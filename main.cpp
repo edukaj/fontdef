@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
 
 		FontdefGenerator fontdefGen{po};
 
-		if (!po.showOnlyUsage())
+		if (po.showOnlyUsage())
+			cout << po << endl;
+		else
 			fontdefGen.generate();
 	}
 	catch(const exception& exc)

@@ -19,6 +19,7 @@ public:
 	CodePointRange& last(int val) noexcept { mLast = val; return *this; }
 
 	friend bool operator == (const CodePointRange& lhs, const CodePointRange& rhs);
+
 	friend std::ostream& operator << (std::ostream& os, const CodePointRange& cp);
 	friend std::istream& operator >> (std::istream& is, CodePointRange& cp);
 

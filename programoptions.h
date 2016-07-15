@@ -7,7 +7,6 @@
 class ProgramOptions {
 public:
 	using CodePoints = std::vector< CodePointRange >;
-	using CodePointssCIt = CodePoints::const_iterator;
 
 	enum class FileFormat { BMP, JPEG, PNG, DDS };
 	enum class LogLevel { NONE, LOW, MEDIUM, HIGH };
@@ -17,6 +16,7 @@ public:
 	friend std::ostream& operator << (std::ostream& os, const ProgramOptions& po);
 
 	bool showOnlyUsage() const noexcept;
+	void printParameterOn(std::ostream& os) const noexcept;
 
 	const std::string& fontName() const noexcept;
 	const std::string& output() const noexcept;
@@ -32,6 +32,8 @@ public:
 	bool isAppend() const noexcept;
 	LogLevel verboseLevel() const noexcept;
 	const CodePoints& codepoints() const noexcept;
+
+	friend std::ostream& operator << (std::ostream& os, const ProgramOptions& po);
 
 private:
 	bool mustDisplayOnlyHelp(int argc) const noexcept;
@@ -50,6 +52,7 @@ private:
 	std::string mImageFilename;
 	std::string mImageExtension;
 	std::vector<CodePointRange> mCodePoints;
+
 	float mSize;
 	int mResolution;
 	int mCharSpace;

@@ -8,8 +8,7 @@
 class FontdefGenerator
 {
 public:
-	FontdefGenerator(const ProgramOptions& po) : mProgramOptions{po}
-	{}
+	FontdefGenerator(const ProgramOptions& po);
 
 	void generate();
 

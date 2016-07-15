@@ -60,6 +60,13 @@ static inline uint32_t firstPO2From(uint32_t n)
 	return n;
 }
 
+FontdefGenerator::FontdefGenerator(const ProgramOptions& po)
+	: mProgramOptions{po}
+{
+	if ((int)po.verboseLevel() >= (int)ProgramOptions::LogLevel::MEDIUM)
+		po.printParameterOn(cout);
+}
+
 void FontdefGenerator::generate()
 {
 	FT_Library ftLib = nullptr;

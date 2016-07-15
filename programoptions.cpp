@@ -1,5 +1,4 @@
 #include "programoptions.h"
-using namespace std;
 
 #include <string>
 #include <utility>
@@ -8,7 +7,13 @@ using namespace std;
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+using namespace std;
 namespace po = boost::program_options;
+
+ostream& operator << (ostream& os, const ProgramOptions& po)
+{
+	return os << po.desc;
+}
 
 boost::filesystem::path getFilenameWithoutExtension(const boost::filesystem::path& p)
 {
@@ -24,7 +29,6 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 
 	if (mustDisplayOnlyHelp(argc))
 	{
-		cout << desc << endl;
 		mShowOnlyUsage = true;
 		return;
 	}
@@ -38,8 +42,6 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		os << *this << endl;
 		throw invalid_argument{os.str()};
 	}
-
-	logParameters();
 }
 
 bool ProgramOptions::showOnlyUsage() const noexcept
@@ -47,35 +49,26 @@ bool ProgramOptions::showOnlyUsage() const noexcept
 	return mShowOnlyUsage;
 }
 
-void ProgramOptions::logParameters()
+void ProgramOptions::printParameterOn(ostream& os) const noexcept
 {
-	if ((int)verboseLevel() >= (int)LogLevel::MEDIUM)
-	{
-		cout
-				<< "\nfont filename:       " << inputFont()
-				<< "\ntitle font resource: " << fontName()
-				<< "\noutput image:        " << imageFilename()
-				<< "\nextension:           " << imageExtension()
-				<< "\nsize:                " << size()
-				<< "\nresolution:          " << resolution()
-				<< "\ncharchter space:     " << charachterSpace()
-				<< "\npixel size:          " << pixelSize()
-				<< "\nfontdef filename:    " << output()
-				<< "\nappend mode:         " << boolalpha << isAppend()
-				<< "\nuse antialias color: " << boolalpha << useAntialiasColor()
-				<< "\nverbose level:       " << (int)verboseLevel()
-				<< "\ncode point:          ";
+	os << "font filename:       " << inputFont()
+	   << "\ntitle font resource: " << fontName()
+	   << "\noutput image:        " << imageFilename()
+	   << "\nextension:           " << imageExtension()
+	   << "\nsize:                " << size()
+	   << "\nresolution:          " << resolution()
+	   << "\ncharchter space:     " << charachterSpace()
+	   << "\npixel size:          " << pixelSize()
+	   << "\nfontdef filename:    " << output()
+	   << "\nappend mode:         " << boolalpha << isAppend()
+	   << "\nuse antialias color: " << boolalpha << useAntialiasColor()
+	   << "\nverbose level:       " << (int)verboseLevel()
+	   << "\ncode point:          ";
 
-		for(const auto& cp : mCodePoints)
-			cout << cp << ' ';
+	for(const auto& cp : codepoints())
+		os << cp << ' ';
 
-		cout << endl;
-	}
-}
-
-ostream& operator << (ostream& os, const ProgramOptions& po)
-{
-	return os << po.desc;
+	os << endl;
 }
 
 const string&ProgramOptions::fontName() const noexcept
