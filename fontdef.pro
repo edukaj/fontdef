@@ -33,7 +33,7 @@ win32-msvc2015 {
     LIBS += -lFreeImage -lfreetype
 }
 
-unix {
+linux-g++ {
     CONFIG += link_pkgconfig
     PKGCONFIG += freetype2
 
