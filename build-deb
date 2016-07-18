@@ -6,12 +6,12 @@ bin=$2
 
 usage() {
 	echo "usage:"
-	echo "build-deb version binary [arch=amd64]"
+	echo "build-deb version binary [arch=amd64] [dist=xenial]"
 	echo
 	echo "example build-dev 1.1-0 ../dist/fontdef"
 }
 
-if [[ $# -ne 2 && $# -ne 3 ]]; then
+if [[ $# -ne 2 && $# -ne 3 && $# -ne 4 ]]; then
 	usage
 	exit 1 
 fi
@@ -21,13 +21,21 @@ folder=fontdef_${version}
 bin_folder=${folder}/usr/bin
 debian=${folder}/DEBIAN
 arch=${3:-amd64}
+dist=${4:-xenial}
 
 if [ ! -d ${folder} ]; then
 	mkdir -p ${bin_folder}
 	mkdir ${debian}
 fi
 
-sed "s/version_to_replace/${version}/g;s/arch/${arch}/g" controlTemplate > ${debian}/control
+if [ ${dist} == "xenial" ]; then
+	sed "s/version_to_replace/${version}/g;s/arch/${arch}/g" controlTemplateXenial > ${debian}/control
+	echo "creating package for xenial ${arch}"
+else
+        sed "s/version_to_replace/${version}/g;s/arch/${arch}/g" controlTemplateTrusty > ${debian}/control
+	echo "creating package for trusty ${arch}"
+fi
+
 cp -r pkg/usr ${folder}
 cp -r ${bin} ${bin_folder}
 

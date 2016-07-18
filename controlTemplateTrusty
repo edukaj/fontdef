@@ -3,7 +3,7 @@ Version: version_to_replace
 Section: base
 Priority: optional
 Architecture: arch
-Depends: libboost-program-options1.54.0 (>= 1.54.0), libboost-filesystem1.54.0 (>= 1.54.0), libboost-system1.54.0 (>= 1.54.0), libfreeimage3 (>= 3.15.0), libfreetype6-dev (>= 2.5.2)
+Depends: libboost-program-options1.54.0 (>= 1.54.0), libboost-filesystem1.54.0 (>= 1.54.0), libboost-system1.54.0 (>= 1.54.0), libfreeimage3 (>= 3.15.4), libfreetype6-dev (>= 2.5.2)
 Maintainer: Dukaj Elvis <edukaj@qubicaamf.com>
 Description: Font generator for OGRE 
  This utility allow you to generate font atlas from a ttf font with

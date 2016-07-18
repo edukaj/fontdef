@@ -38,7 +38,7 @@ static inline uint32_t firstPO2From(uint32_t n)
 }
 
 FontdefGenerator::FontdefGenerator(const ProgramOptions& po)
-	: mProgramOptions{po}
+	: mProgramOptions(po)
 {
 	if ((int)po.verboseLevel() >= (int)ProgramOptions::LogLevel::MEDIUM)
 		po.printParameterOn(cout);
