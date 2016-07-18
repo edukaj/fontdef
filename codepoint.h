@@ -1,5 +1,4 @@
 #pragma once
-
 #ifndef CODEPOINT_H
 #define CODEPOINT_H
 

@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
 	}
 	catch(const exception& exc)
 	{
-		cerr << exc.what() << endl;
+		cerr << "An unexpected error has occured: "
+			 << exc.what() << endl;
 		return EXIT_FAILURE;
 	}
 
