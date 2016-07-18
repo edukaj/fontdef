@@ -51,7 +51,7 @@ void FontdefGenerator::generate()
 	if (FT_Init_FreeType(&ftLib))
 		throw runtime_error{"unable to init FreeType"};
 
-	FT_Face face;
+	FT_Face face = nullptr;
 	if (FT_New_Face(ftLib, mProgramOptions.inputFont().c_str(), 0, &face ))
 		throw runtime_error{"unable to init font face"};
 

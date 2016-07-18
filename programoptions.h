@@ -15,8 +15,6 @@ public:
 
 	ProgramOptions(int argc, char* argv[]);
 
-	friend std::ostream& operator << (std::ostream& os, const ProgramOptions& po);
-
 	bool showOnlyUsage() const noexcept;
 	void printParameterOn(std::ostream& os) const noexcept;
 
