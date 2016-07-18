@@ -35,7 +35,7 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 
 	extractImageFilenameAndExtension();
 
-	if (!exist("input-ttf"))
+	if (!exist("input_ttf"))
 	{
 		ostringstream os;
 		os << "missing filename arguments!\n";
@@ -146,16 +146,16 @@ void ProgramOptions::fillDescription()
 	desc.add_options()
 			("help,h", "produce this message")
 
-			("input-ttf,i",
+			("input_ttf,i",
 			 po::value<string>(&mInputFont),
 			 "input ttf filename")
 
-			("title-font-resource,t",
+			("title_font_resource,t",
 			 po::value<string>(&mFontName)
 			 ->default_value("Font"),
 			 "name of font to use")
 
-			("image-filename,f",
+			("image_filename,f",
 			 po::value<string>(&mImageFilename),
 			 "output image filename")
 
@@ -168,17 +168,17 @@ void ProgramOptions::fillDescription()
 			 ->default_value(96),
 			 "True type resolution")
 
-			("charachter-space",
+			("charachter_space",
 			 po::value<int>(&mCharSpace)
 			 ->default_value(5),
 			 "Spacing between characters to prevent overlap artifacts")
 
-			("pixel-size",
+			("pixel_size",
 			 po::value<int>(&mPixelSize)
 			 ->default_value(1),
 			 "pixel size in bytes of output image")
 
-			("fontdef-filename,o",
+			("fontdef_filename,o",
 			 po::value<string>(&mOutputFontDef)
 			 ->default_value("out.fontdef"),
 			 "outupt fontdef file")
@@ -193,7 +193,7 @@ void ProgramOptions::fillDescription()
 			 ->default_value(0),
 			 "verbose level [0-3]")
 
-			("use-antialias-color",
+			("use_antialias_color",
 			 po::value<bool>(&mUseAntialiasColor)
 			 ->default_value(false),
 			 "use antialias color")
@@ -206,11 +206,11 @@ void ProgramOptions::fillDescription()
 
 void ProgramOptions::extractImageFilenameAndExtension()
 {
-	if (!exist("image-filename"))
+	if (!exist("image_filename"))
 	{
 		ostringstream os;
 
-		mImageFilename = vm["input-ttf"].as<string>();
+		mImageFilename = vm["input_ttf"].as<string>();
 
 		boost::filesystem::path p{mInputFont};
 
