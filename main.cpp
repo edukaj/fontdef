@@ -3,13 +3,11 @@
 
 using namespace std;
 
-
 int main(int argc, char *argv[])
 {
 	try
 	{
 		ProgramOptions po(argc, argv);
-
 
 		if (po.showOnlyUsage())
 			cout << po << endl;

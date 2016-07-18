@@ -25,29 +25,6 @@ private:
 	std::function<void()> f_;
 };
 
-
-
-std::ostream& operator << (std::ostream& os, FT_Face face)
-{
-	const int DESC_WIDTH = 50;
-
-	const auto aviableSize = face->available_sizes;
-
-	os
-	   << std::left
-	   << std::setw(DESC_WIDTH) << "size:" << face->size<< '\n'
-	   << std::setw(DESC_WIDTH) << "number of glyphs:" << face->num_glyphs << '\n'
-	   << std::setw(DESC_WIDTH) << "unit covered by EM:" << face->units_per_EM<< '\n'
-	   << std::setw(DESC_WIDTH) << "number of embedded bitmap strikes:" << face->num_fixed_sizes << '\n';
-
-	if (aviableSize)
-	   os  << std::setw(DESC_WIDTH) << "aviable size "
-		   << aviableSize->width << 'x' << aviableSize->height << ' '
-		   << aviableSize->size << ' ' << aviableSize->x_ppem << 'x' << aviableSize->y_ppem;
-
-	return os << std::endl;
-}
-
 static inline uint32_t firstPO2From(uint32_t n)
 {
 	--n;

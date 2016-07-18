@@ -1,4 +1,6 @@
 #pragma once
+#ifndef PROGRAMOPTIONS_H
+#define PROGRAMOPTIONS_H
 
 #include "codepoint.h"
 #include <boost/program_options.hpp>
@@ -62,3 +64,5 @@ private:
 	bool mUseAntialiasColor;
 	mutable bool mShowOnlyUsage;
 };
+
+#endif // PROGRAMOPTIONS_H

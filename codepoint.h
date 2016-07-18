@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef CODEPOINT_H
+#define CODEPOINT_H
+
 #include <iosfwd>
 #include <string>
 #include <unordered_map>
@@ -27,3 +30,5 @@ private:
 	int mFirst;
 	int mLast;
 };
+
+#endif // CODEPOINT_H

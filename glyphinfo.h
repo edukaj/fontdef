@@ -1,4 +1,6 @@
 #pragma once
+#ifndef GLYPHINFO_H
+#define GLYPHINFO_H
 
 #include "rect.h"
 
@@ -15,3 +17,5 @@ struct GlyphInfo
 	{
 	}
 };
+
+#endif // GLYPHINFO_H

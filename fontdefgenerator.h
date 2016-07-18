@@ -1,4 +1,6 @@
 #pragma once
+#ifndef FONTDEF_GENERATOR_H
+#define FONTDEF_GENERATOR_H
 
 #include "codepoint.h"
 #include "glyphinfo.h"
@@ -25,3 +27,5 @@ private:
 	GlyphInfoMap mGlyphMap;
 	int extractFreeImageExtensionFrom(const std::string& ext);
 };
+
+#endif // FONTDEF_GENERATOR_H

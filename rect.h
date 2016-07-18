@@ -1,4 +1,6 @@
 #pragma once
+#ifndef RECT_H
+#define RECT_H
 
 template< typename T>
 struct Rect {
@@ -79,3 +81,5 @@ struct Rect {
 		return ret;
 	}
 };
+
+#endif // RECT_H
