@@ -62,7 +62,7 @@ private:
 	int mPixelSize;
 	bool mIsAppend;
 	bool mUseAntialiasColor;
-	mutable bool mShowOnlyUsage;
+	mutable bool mShowOnlyUsage = false;
 };
 
 #endif // PROGRAMOPTIONS_H
