@@ -25,13 +25,17 @@ The generated image as power of two side dimensions.
 	-c [ --codepoint ] arg (=33-166)      range of cod points nn-nn ...
 
 
-# Build
-Build this project is really simple just open it with qtcreator and build
-
-If you prefer to build from shell this are the steps
-
 # Dependencies 
-fontdef depends from `boost-program-options` and `freeimage` and `freetype`
+fontdef depends from `boost-program-options`, `boost-filesystem`,`freeimage` and `freetype`
+
+# Build
+
+	git clone https://github.com/edukaj/fontdef
+    cd fontdef
+	mkdir build
+	cd build
+	cmake ..
+	make
 
 ## Linux
 On linux just type 
@@ -46,19 +50,11 @@ or for older Ubuntu (like 14.04 and previous)
 after installed this dependencies follow the instruction below:
 
 
-        git clone https://github.com/edukaj/fontdef
-        cd fontdef
-        mkdir build
-        cd build
-        qmake ../fontdef.pro -r -spec linux-g++
-        make
-	cd -
-
 To create a redistributable debian package I've also created a simple script:
         
 	cd ..
-        ./build-deb 1.0-1 build/fontdef
-        sudo dpkg -i fontdef_1.0-1.deb
+	./build-deb 1.0-1 build/fontdef
+    sudo dpkg -i fontdef_1.0-1.deb
 
 In this way you can use the really useful auto-complete when using the utility
 

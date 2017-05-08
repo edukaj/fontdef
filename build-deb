@@ -2,16 +2,16 @@
 
 name=fontdef
 version=$1
-bin=$2
+bin=${2:-build/${fontdef}}
 
 usage() {
 	echo "usage:"
-	echo "build-deb version binary [arch=amd64] [dist=xenial]"
+	echo "build-deb version [binary=build/fontdef] [arch=amd64] [dist=xenial]"
 	echo
-	echo "example build-dev 1.1-0 ../dist/fontdef"
+	echo "example build-dev"
 }
 
-if [[ $# -ne 2 && $# -ne 3 && $# -ne 4 ]]; then
+if [[ $# -ne 1 && $# -ne 2 && $# -ne 3 && $# -ne 4 ]]; then
 	usage
 	exit 1 
 fi

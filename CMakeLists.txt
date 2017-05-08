@@ -10,7 +10,7 @@ project(fontdef)
 
 find_package(OpenCV REQUIRED)
 
-find_package(Boost 1.62 REQUIRED COMPONENTS system thread filesystem program_options REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem program_options)
 find_package(Freetype REQUIRED)
 find_package(FreeImage REQUIRED)
 
