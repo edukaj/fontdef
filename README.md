@@ -41,7 +41,7 @@ fontdef depends from `boost-program-options`, `boost-filesystem`,`freeimage` and
 On linux just type 
 
 	sudo apt install libboost-program-options-dev libboost-filesystem-dev libboost-system-dev libfreeimage-dev libfreetype6-dev
-
+code
 
 or for older Ubuntu (like 14.04 and previous)
 
@@ -53,8 +53,8 @@ after installed this dependencies follow the instruction below:
 To create a redistributable debian package I've also created a simple script:
         
 	cd ..
-	./build-deb 1.0-1 build/fontdef
-    sudo dpkg -i fontdef_1.0-1.deb
+	./make-deb
+    sudo dpkg -i fontdef*.deb
 
 In this way you can use the really useful auto-complete when using the utility
 
@@ -75,18 +75,3 @@ must be something like `major.minor-revision` for example
 download that libraries and set fontdef.pro 
 
 Maybe some modification are required. 
-
-If you prefer the command line open a shell with all Qt variables setted. In the fontdef.pro file I'm using Visual C++ 2015, 
-I've not tested with other versions.
-
-
-        git clone https://github.com/edukaj/fontdef
-        cd fontdef
-        mkdir build
-        cd build
-        qmake ../fontdef.pro -r -spec win32-msvc2015
-        jom 
- 
-If `jom` is not installed I suggest to download and install it from Qt web page or you can use `nmake`.
-
-I've not yet provided a package manager for windows but is just an exe file.
