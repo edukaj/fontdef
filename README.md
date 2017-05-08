@@ -65,7 +65,7 @@ create a distributable package for an easier installation.
 The usage is really simple `build-deb version generated-binary` where version
 must be something like `major.minor-revision` for example 
 
-	build-deb 1.0-0 ../Release/fontdef
+	build-deb 1.0-0 
 	sudo dpkg -i fontdef_1.0-0.deb
 
 ## windows

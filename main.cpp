@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 
 		if (po.showOnlyUsage())
 			cout << po << endl;
+        else if (po.showOnlyVersion())
+            cout << po.version() << endl;
 		else
 		{
 			FontdefGenerator fontdefGen{po};

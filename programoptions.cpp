@@ -1,4 +1,5 @@
 #include "programoptions.h"
+#include "version.h"
 
 #include <string>
 #include <utility>
@@ -33,6 +34,12 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		return;
 	}
 
+    if (mustDisplayOnlyVersion())
+    {
+        mShowOnlyVersion = true;
+        return;
+    }
+
 	extractImageFilenameAndExtension();
 
 	if (!exist("input_ttf"))
@@ -41,12 +48,23 @@ ProgramOptions::ProgramOptions(int argc, char* argv[])
 		os << "missing filename arguments!\n";
 		os << *this << endl;
 		throw invalid_argument{os.str()};
-	}
+    }
+}
+
+const string& ProgramOptions::version() const noexcept
+{
+    static string fontdefVersion{FONTDEF_VERSION_STR};
+    return fontdefVersion;
 }
 
 bool ProgramOptions::showOnlyUsage() const noexcept
 {
-	return mShowOnlyUsage;
+    return mShowOnlyUsage;
+}
+
+bool ProgramOptions::showOnlyVersion() const noexcept
+{
+    return mShowOnlyVersion;
 }
 
 void ProgramOptions::printParameterOn(ostream& os) const noexcept
@@ -138,13 +156,20 @@ const ProgramOptions::CodePoints&ProgramOptions::codepoints() const noexcept
 
 bool ProgramOptions::mustDisplayOnlyHelp(int argc) const noexcept
 {
-		return vm.count("help") != 0 || argc == 1;
+    return vm.count("help") != 0 || argc == 1;
+}
+
+bool ProgramOptions::mustDisplayOnlyVersion() const noexcept
+{
+    return vm.count("version") != 0;
 }
 
 void ProgramOptions::fillDescription()
 {
 	desc.add_options()
 			("help,h", "produce this message")
+
+            ("version", "Show version")
 
 			("input_ttf,i",
 			 po::value<string>(&mInputFont),

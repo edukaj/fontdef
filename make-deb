@@ -1,0 +1,49 @@
+#!/bin/bash
+
+name=fontdef
+bin=${1:-build/${name}}
+
+usage() {
+	echo "usage:"
+	echo "make-deb [binary=build/fontdef] [arch=amd64] [dist=xenial]"
+	echo
+	echo "example:"
+	echo "./make-deb"
+}
+
+if [[ $# -gt 3 ]]; then
+	usage
+	exit 1 
+fi
+
+major=$(grep "#define FONTDEF_VERSION_MAJOR" version.h | cut --delimiter=' ' --fields=3)
+minor=$(grep "#define FONTDEF_VERSION_MINOR" version.h | cut --delimiter=' ' --fields=3)
+bugfix=$(grep "#define FONTDEF_VERSION_BUGFIX" version.h | cut --delimiter=' ' --fields=3)
+
+fontdef_version=${major}.${minor}-${bugfix}
+
+echo fontdef version is ${fontdef_version}
+
+folder=fontdef_${fontdef_version}
+bin_folder=${folder}/usr/bin
+debian=${folder}/DEBIAN
+arch=${2:-amd64}
+dist=${3:-xenial}
+
+if [ ! -d ${folder} ]; then
+	mkdir -p ${bin_folder}
+	mkdir ${debian}
+fi
+
+if [ ${dist} == "xenial" ]; then
+	sed "s/version_to_replace/${fontdef_version}/g;s/arch/${arch}/g" controlTemplateXenial > ${debian}/control
+	echo "creating package for xenial ${arch}"
+else
+        sed "s/version_to_replace/${fontdef_version}/g;s/arch/${arch}/g" controlTemplateTrusty > ${debian}/control
+	echo "creating package for trusty ${arch}"
+fi
+
+cp -r pkg/usr ${folder}
+cp -r ${bin} ${bin_folder}
+
+dpkg-deb --build ${folder}

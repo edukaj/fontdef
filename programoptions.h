@@ -3,6 +3,7 @@
 #define PROGRAMOPTIONS_H
 
 #include "codepoint.h"
+#include <string>
 #include <boost/program_options.hpp>
 #include <iosfwd>
 
@@ -15,7 +16,10 @@ public:
 
 	ProgramOptions(int argc, char* argv[]);
 
+    const std::string& version() const noexcept;
+
 	bool showOnlyUsage() const noexcept;
+    bool showOnlyVersion() const noexcept;
 	void printParameterOn(std::ostream& os) const noexcept;
 
 	const std::string& fontName() const noexcept;
@@ -37,6 +41,7 @@ public:
 
 private:
 	bool mustDisplayOnlyHelp(int argc) const noexcept;
+    bool mustDisplayOnlyVersion() const noexcept;
 	void fillDescription();
 	void extractImageFilenameAndExtension();
 	bool exist(const std::string& str) const noexcept;
@@ -60,7 +65,8 @@ private:
 	int mPixelSize;
 	bool mIsAppend;
 	bool mUseAntialiasColor;
-	mutable bool mShowOnlyUsage = false;
+    bool mShowOnlyVersion;
+    bool mShowOnlyUsage;
 };
 
 #endif // PROGRAMOPTIONS_H
